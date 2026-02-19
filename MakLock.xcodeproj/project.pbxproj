@@ -24,6 +24,9 @@
 		A10000000000000000000205 /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000215 /* Defaults.swift */; };
 		A10000000000000000000206 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000216 /* KeychainManager.swift */; };
 		A10000000000000000000301 /* SafetyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000311 /* SafetyManager.swift */; };
+		A10000000000000000000401 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000411 /* MenuBarController.swift */; };
+		A10000000000000000000402 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000412 /* AppDelegate.swift */; };
+		A10000000000000000000403 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000413 /* MenuBarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +49,9 @@
 		A10000000000000000000215 /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
 		A10000000000000000000216 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 		A10000000000000000000311 /* SafetyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafetyManager.swift; sourceTree = "<group>"; };
+		A10000000000000000000411 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		A10000000000000000000412 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A10000000000000000000413 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000011 /* MakLockApp.swift */,
+				A10000000000000000000412 /* AppDelegate.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -159,6 +166,8 @@
 		A100000000000000000000D3 /* MenuBar */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000411 /* MenuBarController.swift */,
+				A10000000000000000000413 /* MenuBarView.swift */,
 			);
 			path = MenuBar;
 			sourceTree = "<group>";
@@ -303,6 +312,9 @@
 				A10000000000000000000205 /* Defaults.swift in Sources */,
 				A10000000000000000000206 /* KeychainManager.swift in Sources */,
 				A10000000000000000000301 /* SafetyManager.swift in Sources */,
+				A10000000000000000000401 /* MenuBarController.swift in Sources */,
+				A10000000000000000000402 /* AppDelegate.swift in Sources */,
+				A10000000000000000000403 /* MenuBarView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
