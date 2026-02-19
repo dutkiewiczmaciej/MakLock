@@ -48,6 +48,9 @@ final class OverlayWindowService {
         // Mark the app as authenticated so it won't re-lock immediately
         if let app = currentApp {
             AppMonitorService.shared.markAuthenticated(app.bundleIdentifier)
+
+            // Bring the protected app back to the foreground
+            activateProtectedApp(bundleIdentifier: app.bundleIdentifier)
         }
 
         overlayWindows.forEach { $0.close() }
@@ -106,6 +109,19 @@ final class OverlayWindowService {
         if let app = runningApps.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
             app.hide()
             NSLog("[MakLock] Hidden app windows: %@", bundleIdentifier)
+        }
+    }
+
+    /// Bring the protected app back to the foreground after successful auth.
+    private func activateProtectedApp(bundleIdentifier: String) {
+        let runningApps = NSWorkspace.shared.runningApplications
+        if let app = runningApps.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
+            // Small delay to let overlay close first
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                app.unhide()
+                app.activate(options: [.activateIgnoringOtherApps])
+                NSLog("[MakLock] Activated app: %@", bundleIdentifier)
+            }
         }
     }
 
