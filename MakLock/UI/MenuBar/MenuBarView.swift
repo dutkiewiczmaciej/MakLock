@@ -2,8 +2,11 @@ import SwiftUI
 
 /// SwiftUI content for the menu bar popover dropdown.
 struct MenuBarView: View {
+    let onToggleProtection: () -> Void
     let onSettingsClicked: () -> Void
     let onQuitClicked: () -> Void
+
+    @State private var isProtectionEnabled = Defaults.shared.appSettings.isProtectionEnabled
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -23,18 +26,38 @@ struct MenuBarView: View {
             Divider()
                 .padding(.horizontal, 8)
 
-            // Status
+            // Status + Quick Toggle
             HStack {
                 Circle()
-                    .fill(MakLockColors.success)
+                    .fill(isProtectionEnabled ? MakLockColors.success : MakLockColors.textSecondary)
                     .frame(width: 8, height: 8)
-                Text("Protection Active")
+                Text(isProtectionEnabled ? "Protection Active" : "Protection Off")
                     .font(MakLockTypography.body)
                     .foregroundColor(.secondary)
                 Spacer()
+                Toggle("", isOn: $isProtectionEnabled)
+                    .toggleStyle(.switch)
+                    .controlSize(.small)
+                    .labelsHidden()
+                    .onChange(of: isProtectionEnabled) { _ in
+                        onToggleProtection()
+                    }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
+
+            // Protected apps count
+            let appCount = ProtectedAppsManager.shared.apps.filter(\.isEnabled).count
+            HStack(spacing: 6) {
+                Image(systemName: "app.badge.checkmark")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+                Text("\(appCount) protected app\(appCount == 1 ? "" : "s")")
+                    .font(MakLockTypography.caption)
+                    .foregroundColor(.secondary)
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 10)
 
             Divider()
                 .padding(.horizontal, 8)
