@@ -33,9 +33,8 @@ final class OverlayWindowService {
                 onUnlock: { [weak self] in
                     self?.handleUnlock()
                 },
-                onUsePassword: { [weak self] in
-                    guard let self, let app = self.currentApp else { return }
-                    self.onPasswordRequested?(app)
+                onDismiss: { [weak self] in
+                    self?.hide()
                 }
             )
 
