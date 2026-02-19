@@ -10,6 +10,13 @@
 		A10000000000000000000001 /* MakLockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* MakLockApp.swift */; };
 		A10000000000000000000002 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* Assets.xcassets */; };
 		A10000000000000000000F03 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000F02 /* HotKey */; };
+		A10000000000000000000101 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000111 /* Colors.swift */; };
+		A10000000000000000000102 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* Typography.swift */; };
+		A10000000000000000000103 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000113 /* Animations.swift */; };
+		A10000000000000000000104 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000114 /* BlurView.swift */; };
+		A10000000000000000000105 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000115 /* PrimaryButton.swift */; };
+		A10000000000000000000106 /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000116 /* SecondaryButton.swift */; };
+		A10000000000000000000107 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000117 /* AppIconView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +25,13 @@
 		A10000000000000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A10000000000000000000014 /* MakLock.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MakLock.entitlements; sourceTree = "<group>"; };
+		A10000000000000000000111 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		A10000000000000000000112 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		A10000000000000000000113 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
+		A10000000000000000000114 /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		A10000000000000000000115 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
+		A10000000000000000000116 /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
+		A10000000000000000000117 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +121,9 @@
 		A100000000000000000000D1 /* Design */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000111 /* Colors.swift */,
+				A10000000000000000000112 /* Typography.swift */,
+				A10000000000000000000113 /* Animations.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
@@ -114,6 +131,10 @@
 		A100000000000000000000D2 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000114 /* BlurView.swift */,
+				A10000000000000000000115 /* PrimaryButton.swift */,
+				A10000000000000000000116 /* SecondaryButton.swift */,
+				A10000000000000000000117 /* AppIconView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -247,6 +268,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000001 /* MakLockApp.swift in Sources */,
+				A10000000000000000000101 /* Colors.swift in Sources */,
+				A10000000000000000000102 /* Typography.swift in Sources */,
+				A10000000000000000000103 /* Animations.swift in Sources */,
+				A10000000000000000000104 /* BlurView.swift in Sources */,
+				A10000000000000000000105 /* PrimaryButton.swift in Sources */,
+				A10000000000000000000106 /* SecondaryButton.swift in Sources */,
+				A10000000000000000000107 /* AppIconView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
