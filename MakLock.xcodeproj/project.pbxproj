@@ -37,6 +37,9 @@
 		A10000000000000000000602 /* ProtectedAppsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000612 /* ProtectedAppsManager.swift */; };
 		A10000000000000000000701 /* AppPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000711 /* AppPickerView.swift */; };
 		A10000000000000000000702 /* AppPickerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000712 /* AppPickerWindow.swift */; };
+		A10000000000000000000801 /* LockOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000811 /* LockOverlayWindow.swift */; };
+		A10000000000000000000802 /* LockOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000812 /* LockOverlayView.swift */; };
+		A10000000000000000000803 /* OverlayWindowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000813 /* OverlayWindowService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +75,9 @@
 		A10000000000000000000612 /* ProtectedAppsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedAppsManager.swift; sourceTree = "<group>"; };
 		A10000000000000000000711 /* AppPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPickerView.swift; sourceTree = "<group>"; };
 		A10000000000000000000712 /* AppPickerWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPickerWindow.swift; sourceTree = "<group>"; };
+		A10000000000000000000811 /* LockOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockOverlayWindow.swift; sourceTree = "<group>"; };
+		A10000000000000000000812 /* LockOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockOverlayView.swift; sourceTree = "<group>"; };
+		A10000000000000000000813 /* OverlayWindowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000611 /* AppMonitorService.swift */,
+				A10000000000000000000813 /* OverlayWindowService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -210,6 +217,8 @@
 		A100000000000000000000D5 /* LockOverlay */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000811 /* LockOverlayWindow.swift */,
+				A10000000000000000000812 /* LockOverlayView.swift */,
 			);
 			path = LockOverlay;
 			sourceTree = "<group>";
@@ -355,6 +364,9 @@
 				A10000000000000000000602 /* ProtectedAppsManager.swift in Sources */,
 			A10000000000000000000701 /* AppPickerView.swift in Sources */,
 			A10000000000000000000702 /* AppPickerWindow.swift in Sources */,
+				A10000000000000000000801 /* LockOverlayWindow.swift in Sources */,
+				A10000000000000000000802 /* LockOverlayView.swift in Sources */,
+				A10000000000000000000803 /* OverlayWindowService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
