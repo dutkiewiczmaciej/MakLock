@@ -17,6 +17,10 @@
 		A10000000000000000000105 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000115 /* PrimaryButton.swift */; };
 		A10000000000000000000106 /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000116 /* SecondaryButton.swift */; };
 		A10000000000000000000107 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000117 /* AppIconView.swift */; };
+		A10000000000000000000201 /* ProtectedApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000211 /* ProtectedApp.swift */; };
+		A10000000000000000000202 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000212 /* AppSettings.swift */; };
+		A10000000000000000000203 /* LockSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000213 /* LockSession.swift */; };
+		A10000000000000000000204 /* AuthMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000214 /* AuthMethod.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +36,10 @@
 		A10000000000000000000115 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		A10000000000000000000116 /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
 		A10000000000000000000117 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
+		A10000000000000000000211 /* ProtectedApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedApp.swift; sourceTree = "<group>"; };
+		A10000000000000000000212 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		A10000000000000000000213 /* LockSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockSession.swift; sourceTree = "<group>"; };
+		A10000000000000000000214 /* AuthMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthMethod.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -170,6 +178,10 @@
 		A100000000000000000000E0 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000211 /* ProtectedApp.swift */,
+				A10000000000000000000212 /* AppSettings.swift */,
+				A10000000000000000000213 /* LockSession.swift */,
+				A10000000000000000000214 /* AuthMethod.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -275,6 +287,10 @@
 				A10000000000000000000105 /* PrimaryButton.swift in Sources */,
 				A10000000000000000000106 /* SecondaryButton.swift in Sources */,
 				A10000000000000000000107 /* AppIconView.swift in Sources */,
+				A10000000000000000000201 /* ProtectedApp.swift in Sources */,
+				A10000000000000000000202 /* AppSettings.swift in Sources */,
+				A10000000000000000000203 /* LockSession.swift in Sources */,
+				A10000000000000000000204 /* AuthMethod.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
