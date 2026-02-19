@@ -25,6 +25,10 @@ final class LockOverlayWindow: NSWindow {
         setFrame(screen.frame, display: true)
     }
 
-    override var canBecomeKey: Bool { true }
+    /// Whether the window should accept key status.
+    /// Disabled during Touch ID (system dialog needs focus), enabled for password input.
+    var allowKeyStatus = false
+
+    override var canBecomeKey: Bool { allowKeyStatus }
     override var canBecomeMain: Bool { false }
 }

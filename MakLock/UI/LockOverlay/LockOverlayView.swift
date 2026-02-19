@@ -71,6 +71,7 @@ struct LockOverlayView: View {
                         .padding(.top, 4)
 
                         SecondaryButton("Use Password Instead") {
+                            OverlayWindowService.shared.enableKeyboardInput()
                             withAnimation(MakLockAnimations.standard) {
                                 showPasswordInput = true
                             }

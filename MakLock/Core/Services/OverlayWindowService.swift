@@ -35,9 +35,7 @@ final class OverlayWindowService {
         createOverlayWindows(for: app)
         startTimeoutTimer()
 
-        // Activate MakLock so the overlay gets focus (needed for Touch ID prompt)
-        NSApp.activate(ignoringOtherApps: true)
-
+        // Don't activate or make key — the system Touch ID dialog needs focus
         NSLog("[MakLock] Overlay shown for: %@", app.name)
     }
 
@@ -69,6 +67,15 @@ final class OverlayWindowService {
         !overlayWindows.isEmpty
     }
 
+    /// Enable key window status on overlay windows (needed for password input).
+    func enableKeyboardInput() {
+        for window in overlayWindows {
+            window.allowKeyStatus = true
+            window.makeKeyAndOrderFront(nil)
+        }
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
     // MARK: - Screen Management
 
     @objc private func screensDidChange(_ notification: Notification) {
@@ -95,7 +102,8 @@ final class OverlayWindowService {
             )
 
             window.contentView = NSHostingView(rootView: overlayView)
-            window.makeKeyAndOrderFront(nil)
+            // Don't make key — system Touch ID dialog needs key status for fingerprint
+            window.orderFront(nil)
             window.orderFrontRegardless()
             overlayWindows.append(window)
         }
@@ -119,7 +127,7 @@ final class OverlayWindowService {
             // Small delay to let overlay close first
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 app.unhide()
-                app.activate(options: [.activateIgnoringOtherApps])
+                app.activate()
                 NSLog("[MakLock] Activated app: %@", bundleIdentifier)
             }
         }
