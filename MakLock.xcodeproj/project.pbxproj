@@ -35,6 +35,8 @@
 		A10000000000000000000506 /* WatchSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000516 /* WatchSettingsView.swift */; };
 		A10000000000000000000601 /* AppMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000611 /* AppMonitorService.swift */; };
 		A10000000000000000000602 /* ProtectedAppsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000612 /* ProtectedAppsManager.swift */; };
+		A10000000000000000000701 /* AppPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000711 /* AppPickerView.swift */; };
+		A10000000000000000000702 /* AppPickerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000712 /* AppPickerWindow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,6 +70,8 @@
 		A10000000000000000000516 /* WatchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSettingsView.swift; sourceTree = "<group>"; };
 		A10000000000000000000611 /* AppMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMonitorService.swift; sourceTree = "<group>"; };
 		A10000000000000000000612 /* ProtectedAppsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedAppsManager.swift; sourceTree = "<group>"; };
+		A10000000000000000000711 /* AppPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPickerView.swift; sourceTree = "<group>"; };
+		A10000000000000000000712 /* AppPickerWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPickerWindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,6 +217,8 @@
 		A100000000000000000000D6 /* AppPicker */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000711 /* AppPickerView.swift */,
+				A10000000000000000000712 /* AppPickerWindow.swift */,
 			);
 			path = AppPicker;
 			sourceTree = "<group>";
@@ -347,6 +353,8 @@
 				A10000000000000000000506 /* WatchSettingsView.swift in Sources */,
 				A10000000000000000000601 /* AppMonitorService.swift in Sources */,
 				A10000000000000000000602 /* ProtectedAppsManager.swift in Sources */,
+			A10000000000000000000701 /* AppPickerView.swift in Sources */,
+			A10000000000000000000702 /* AppPickerWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,14 +2,15 @@ import SwiftUI
 
 /// Apps settings tab: manage the list of protected applications.
 struct AppsSettingsView: View {
-    @State private var protectedApps: [ProtectedApp] = []
+    @StateObject private var manager = ProtectedAppsManager.shared
+    @State private var appPickerController = AppPickerWindowController()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Protected Applications")
                 .font(MakLockTypography.title)
 
-            if protectedApps.isEmpty {
+            if manager.apps.isEmpty {
                 emptyState
             } else {
                 appsList
@@ -20,14 +21,11 @@ struct AppsSettingsView: View {
             HStack {
                 Spacer()
                 PrimaryButton("Add App", icon: "plus") {
-                    // App picker will be connected in Task 8
+                    appPickerController.show()
                 }
             }
         }
         .padding()
-        .onAppear {
-            protectedApps = Defaults.shared.protectedApps
-        }
     }
 
     private var emptyState: some View {
@@ -49,7 +47,7 @@ struct AppsSettingsView: View {
 
     private var appsList: some View {
         List {
-            ForEach($protectedApps) { $app in
+            ForEach(manager.apps) { app in
                 HStack(spacing: 12) {
                     AppIconView(bundleIdentifier: app.bundleIdentifier, size: 32)
                     VStack(alignment: .leading, spacing: 2) {
@@ -60,14 +58,17 @@ struct AppsSettingsView: View {
                             .foregroundColor(.secondary)
                     }
                     Spacer()
-                    Toggle("", isOn: $app.isEnabled)
-                        .toggleStyle(.switch)
+                    Toggle("", isOn: Binding(
+                        get: { app.isEnabled },
+                        set: { _ in manager.toggleApp(app) }
+                    ))
+                    .toggleStyle(.switch)
                 }
                 .padding(.vertical, 4)
             }
             .onDelete { indexSet in
-                protectedApps.remove(atOffsets: indexSet)
-                Defaults.shared.protectedApps = protectedApps
+                let appsToRemove = indexSet.map { manager.apps[$0] }
+                appsToRemove.forEach { manager.removeApp($0) }
             }
         }
     }
