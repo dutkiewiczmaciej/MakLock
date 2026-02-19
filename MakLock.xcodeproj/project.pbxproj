@@ -42,6 +42,9 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000032 /* App */,
+				A100000000000000000000C0 /* Core */,
+				A100000000000000000000D0 /* UI */,
+				A100000000000000000000E0 /* Models */,
 				A10000000000000000000033 /* Resources */,
 			);
 			path = MakLock;
@@ -53,6 +56,99 @@
 				A10000000000000000000011 /* MakLockApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000C0 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A100000000000000000000C1 /* Services */,
+				A100000000000000000000C2 /* Managers */,
+				A100000000000000000000C3 /* Storage */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000C1 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000C2 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000C3 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D0 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				A100000000000000000000D1 /* Design */,
+				A100000000000000000000D2 /* Components */,
+				A100000000000000000000D3 /* MenuBar */,
+				A100000000000000000000D4 /* Settings */,
+				A100000000000000000000D5 /* LockOverlay */,
+				A100000000000000000000D6 /* AppPicker */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D1 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D2 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D3 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D4 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D5 /* LockOverlay */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = LockOverlay;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D6 /* AppPicker */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = AppPicker;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000E0 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		A10000000000000000000033 /* Resources */ = {
