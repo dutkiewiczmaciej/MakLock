@@ -7,6 +7,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         menuBarController.setup()
 
+        // Show onboarding on first launch
+        OnboardingWindowController.shared.showIfNeeded()
+
         // Initialize safety manager and wire up panic key
         SafetyManager.shared.onPanicKeyPressed = { [weak self] in
             OverlayWindowService.shared.dismissAll()

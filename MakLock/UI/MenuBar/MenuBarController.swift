@@ -25,9 +25,12 @@ final class MenuBarController {
         updateIcon()
 
         let popover = NSPopover()
-        popover.contentSize = NSSize(width: 260, height: 200)
+        popover.contentSize = NSSize(width: 260, height: 280)
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: MenuBarView(
+            onToggleProtection: { [weak self] in
+                self?.toggleProtection()
+            },
             onSettingsClicked: { [weak self] in
                 self?.hidePopover()
                 NotificationCenter.default.post(name: .openSettings, object: nil)
@@ -57,18 +60,48 @@ final class MenuBarController {
         popover?.performClose(nil)
     }
 
+    private func toggleProtection() {
+        var settings = Defaults.shared.appSettings
+        settings.isProtectionEnabled.toggle()
+        Defaults.shared.appSettings = settings
+
+        if !settings.isProtectionEnabled {
+            OverlayWindowService.shared.dismissAll()
+            iconState = .idle
+        } else {
+            iconState = .active
+        }
+    }
+
     private func updateIcon() {
         guard let button = statusItem?.button else { return }
         let symbolName: String
         switch iconState {
         case .idle:
-            symbolName = "lock"
+            symbolName = "lock.open"
         case .active:
-            symbolName = "lock.fill"
+            symbolName = "lock"
         case .locked:
             symbolName = "lock.fill"
         }
-        button.image = NSImage(systemSymbolName: symbolName, accessibilityDescription: "MakLock")
+
+        let image = NSImage(systemSymbolName: symbolName, accessibilityDescription: "MakLock")
+
+        // Add a small badge dot for locked state
+        if iconState == .locked, let baseImage = image {
+            let size = NSSize(width: 18, height: 18)
+            let badged = NSImage(size: size, flipped: false) { rect in
+                baseImage.draw(in: NSRect(x: 0, y: 2, width: 14, height: 14))
+                NSColor.systemOrange.setFill()
+                let dot = NSRect(x: 12, y: 12, width: 6, height: 6)
+                NSBezierPath(ovalIn: dot).fill()
+                return true
+            }
+            badged.isTemplate = false
+            button.image = badged
+        } else {
+            button.image = image
+        }
     }
 }
 

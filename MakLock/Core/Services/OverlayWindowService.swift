@@ -15,7 +15,15 @@ final class OverlayWindowService {
     /// Callback when the user requests password input.
     var onPasswordRequested: ((ProtectedApp) -> Void)?
 
-    private init() {}
+    private init() {
+        // Observe screen configuration changes (connect/disconnect monitors)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(screensDidChange),
+            name: NSApplication.didChangeScreenParametersNotification,
+            object: nil
+        )
+    }
 
     /// Show the lock overlay for a protected app on all screens.
     func show(for app: ProtectedApp) {
@@ -23,26 +31,7 @@ final class OverlayWindowService {
         guard overlayWindows.isEmpty else { return }
 
         currentApp = app
-
-        for screen in NSScreen.screens {
-            let window = LockOverlayWindow(for: screen)
-
-            let overlayView = LockOverlayView(
-                appName: app.name,
-                bundleIdentifier: app.bundleIdentifier,
-                onUnlock: { [weak self] in
-                    self?.handleUnlock()
-                },
-                onDismiss: { [weak self] in
-                    self?.hide()
-                }
-            )
-
-            window.contentView = NSHostingView(rootView: overlayView)
-            window.makeKeyAndOrderFront(nil)
-            overlayWindows.append(window)
-        }
-
+        createOverlayWindows(for: app)
         startTimeoutTimer()
         NSLog("[MakLock] Overlay shown for: %@", app.name)
     }
@@ -64,6 +53,39 @@ final class OverlayWindowService {
     /// Whether an overlay is currently displayed.
     var isShowing: Bool {
         !overlayWindows.isEmpty
+    }
+
+    // MARK: - Screen Management
+
+    @objc private func screensDidChange(_ notification: Notification) {
+        guard let app = currentApp, !overlayWindows.isEmpty else { return }
+
+        // Rebuild overlays for the new screen configuration
+        overlayWindows.forEach { $0.close() }
+        overlayWindows.removeAll()
+        createOverlayWindows(for: app)
+        NSLog("[MakLock] Overlays repositioned for screen change (%d screens)", NSScreen.screens.count)
+    }
+
+    private func createOverlayWindows(for app: ProtectedApp) {
+        for screen in NSScreen.screens {
+            let window = LockOverlayWindow(for: screen)
+
+            let overlayView = LockOverlayView(
+                appName: app.name,
+                bundleIdentifier: app.bundleIdentifier,
+                onUnlock: { [weak self] in
+                    self?.handleUnlock()
+                },
+                onDismiss: { [weak self] in
+                    self?.hide()
+                }
+            )
+
+            window.contentView = NSHostingView(rootView: overlayView)
+            window.makeKeyAndOrderFront(nil)
+            overlayWindows.append(window)
+        }
     }
 
     // MARK: - Timeout
