@@ -22,10 +22,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.menuBarController.iconState = .locked
         }
 
-        // Unlock hides the overlay (auth service comes in Task 10)
-        OverlayWindowService.shared.onUnlockRequested = { [weak self] _ in
-            OverlayWindowService.shared.hide()
-            self?.menuBarController.iconState = .active
+        // Wire up unlock: trigger Touch ID authentication
+        OverlayWindowService.shared.onUnlockRequested = { [weak self] app in
+            AuthenticationService.shared.authenticateWithTouchID(
+                reason: "Unlock \(app.name)"
+            ) { result in
+                switch result {
+                case .success:
+                    OverlayWindowService.shared.hide()
+                    self?.menuBarController.iconState = .active
+                case .failure:
+                    // Touch ID failed — user can try password fallback
+                    break
+                case .cancelled:
+                    break
+                }
+            }
+        }
+
+        // Wire up password fallback
+        OverlayWindowService.shared.onPasswordRequested = { [weak self] _ in
+            // Password input is handled in PasswordInputView
+            // On success, dismiss overlay
+            // This will be enhanced when PasswordInputView is integrated into overlay
+            _ = self
         }
 
         // Start monitoring
