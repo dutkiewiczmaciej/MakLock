@@ -9,5 +9,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Initialize safety manager (registers panic key)
         _ = SafetyManager.shared
+
+        // Initialize settings window controller (listens for openSettings notification)
+        _ = SettingsWindowController.shared
     }
 }

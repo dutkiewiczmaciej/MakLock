@@ -27,6 +27,12 @@
 		A10000000000000000000401 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000411 /* MenuBarController.swift */; };
 		A10000000000000000000402 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000412 /* AppDelegate.swift */; };
 		A10000000000000000000403 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000413 /* MenuBarView.swift */; };
+		A10000000000000000000501 /* SettingsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000511 /* SettingsWindow.swift */; };
+		A10000000000000000000502 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000512 /* SettingsView.swift */; };
+		A10000000000000000000503 /* GeneralSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000513 /* GeneralSettingsView.swift */; };
+		A10000000000000000000504 /* AppsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000514 /* AppsSettingsView.swift */; };
+		A10000000000000000000505 /* SecuritySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000515 /* SecuritySettingsView.swift */; };
+		A10000000000000000000506 /* WatchSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000516 /* WatchSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +58,12 @@
 		A10000000000000000000411 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		A10000000000000000000412 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A10000000000000000000413 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		A10000000000000000000511 /* SettingsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindow.swift; sourceTree = "<group>"; };
+		A10000000000000000000512 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000513 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000514 /* AppsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppsSettingsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000515 /* SecuritySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuritySettingsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000516 /* WatchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +187,12 @@
 		A100000000000000000000D4 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000511 /* SettingsWindow.swift */,
+				A10000000000000000000512 /* SettingsView.swift */,
+				A10000000000000000000513 /* GeneralSettingsView.swift */,
+				A10000000000000000000514 /* AppsSettingsView.swift */,
+				A10000000000000000000515 /* SecuritySettingsView.swift */,
+				A10000000000000000000516 /* WatchSettingsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -315,6 +333,12 @@
 				A10000000000000000000401 /* MenuBarController.swift in Sources */,
 				A10000000000000000000402 /* AppDelegate.swift in Sources */,
 				A10000000000000000000403 /* MenuBarView.swift in Sources */,
+				A10000000000000000000501 /* SettingsWindow.swift in Sources */,
+				A10000000000000000000502 /* SettingsView.swift in Sources */,
+				A10000000000000000000503 /* GeneralSettingsView.swift in Sources */,
+				A10000000000000000000504 /* AppsSettingsView.swift in Sources */,
+				A10000000000000000000505 /* SecuritySettingsView.swift in Sources */,
+				A10000000000000000000506 /* WatchSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
