@@ -82,5 +82,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Start sleep/wake observer
         SleepWakeService.shared.startObserving()
+
+        // Wire up Watch proximity → auto-unlock when Watch is in range
+        WatchProximityService.shared.onWatchInRange = { [weak self] in
+            guard OverlayWindowService.shared.isShowing else { return }
+            OverlayWindowService.shared.hide()
+            self?.menuBarController.iconState = .active
+            NSLog("[MakLock] Auto-unlocked via Watch proximity")
+        }
+
+        // Wire up Watch proximity → lock when Watch leaves range
+        WatchProximityService.shared.onWatchOutOfRange = { [weak self] in
+            guard let self else { return }
+            let apps = ProtectedAppsManager.shared.apps.filter(\.isEnabled)
+            for app in apps {
+                OverlayWindowService.shared.show(for: app)
+            }
+            if !apps.isEmpty {
+                self.menuBarController.iconState = .locked
+            }
+        }
+
+        // Start Watch proximity if enabled
+        if Defaults.shared.appSettings.useWatchUnlock {
+            WatchProximityService.shared.startScanning()
+        }
     }
 }
