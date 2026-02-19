@@ -63,12 +63,16 @@ struct AppsSettingsView: View {
                         set: { _ in manager.toggleApp(app) }
                     ))
                     .toggleStyle(.switch)
+                    .tint(MakLockColors.gold)
+
+                    Button(action: { manager.removeApp(app) }) {
+                        Image(systemName: "trash")
+                            .font(.system(size: 12))
+                            .foregroundColor(MakLockColors.error)
+                    }
+                    .buttonStyle(.plain)
                 }
                 .padding(.vertical, 4)
-            }
-            .onDelete { indexSet in
-                let appsToRemove = indexSet.map { manager.apps[$0] }
-                appsToRemove.forEach { manager.removeApp($0) }
             }
         }
     }

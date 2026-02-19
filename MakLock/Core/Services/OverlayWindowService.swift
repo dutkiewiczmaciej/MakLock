@@ -28,6 +28,10 @@ final class OverlayWindowService {
         guard overlayWindows.isEmpty else { return }
 
         currentApp = app
+
+        // Hide the protected app's windows so they don't show through the overlay
+        hideProtectedApp(bundleIdentifier: app.bundleIdentifier)
+
         createOverlayWindows(for: app)
         startTimeoutTimer()
 
@@ -91,6 +95,17 @@ final class OverlayWindowService {
             window.makeKeyAndOrderFront(nil)
             window.orderFrontRegardless()
             overlayWindows.append(window)
+        }
+    }
+
+    // MARK: - App Window Management
+
+    /// Hide the protected app's windows so content isn't visible behind the overlay.
+    private func hideProtectedApp(bundleIdentifier: String) {
+        let runningApps = NSWorkspace.shared.runningApplications
+        if let app = runningApps.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
+            app.hide()
+            NSLog("[MakLock] Hidden app windows: %@", bundleIdentifier)
         }
     }
 

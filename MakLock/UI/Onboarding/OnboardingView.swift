@@ -1,4 +1,5 @@
 import SwiftUI
+import ServiceManagement
 
 /// First-launch onboarding view with welcome, safety tutorial, password setup, and finish.
 struct OnboardingView: View {
@@ -19,12 +20,8 @@ struct OnboardingView: View {
             icon: "plus.app.fill",
             title: "Add Apps to Protect",
             description: "Open Settings → Apps to choose which applications require authentication.\n\nStart with a test app like Chess."
-        ),
-        4: OnboardingInfoStep(
-            icon: "touchid",
-            title: "You're All Set",
-            description: "MakLock runs in your menu bar.\nProtected apps will require Touch ID to open — just put your finger on the sensor."
         )
+        // Step 4 = Final Step (custom view with Launch at Login toggle)
     ]
 
     var body: some View {
@@ -35,6 +32,8 @@ struct OnboardingView: View {
                     PanicKeyStep()
                 case 2:
                     PasswordSetupStep(onContinue: { advanceStep() })
+                case 4:
+                    FinalStep()
                 default:
                     if let info = infoSteps[currentStep] {
                         InfoStepView(step: info)
@@ -302,6 +301,77 @@ private struct PasswordSetupStep: View {
             }
         } else {
             errorMessage = "Failed to save. Please try again."
+        }
+    }
+}
+
+// MARK: - Final Step
+
+private struct FinalStep: View {
+    @State private var launchAtLogin = true
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+
+            Image(systemName: "touchid")
+                .font(.system(size: 48))
+                .foregroundColor(MakLockColors.gold)
+                .frame(height: 60)
+
+            Text("You're All Set")
+                .font(MakLockTypography.largeTitle)
+                .foregroundColor(MakLockColors.textPrimary)
+                .multilineTextAlignment(.center)
+
+            Text("MakLock runs in your menu bar.\nProtected apps will require Touch ID — just put your finger on the sensor.")
+                .font(MakLockTypography.body)
+                .foregroundColor(MakLockColors.textSecondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 340)
+
+            VStack(spacing: 12) {
+                Toggle("Launch MakLock at login", isOn: $launchAtLogin)
+                    .toggleStyle(.switch)
+                    .tint(MakLockColors.gold)
+
+                Text("You can also configure idle auto-lock\nand other options in Settings.")
+                    .font(MakLockTypography.caption)
+                    .foregroundColor(MakLockColors.textSecondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 40)
+            .padding(.top, 8)
+
+            Spacer()
+        }
+        .onAppear {
+            // Enable launch at login by default during onboarding
+            enableLaunchAtLogin()
+        }
+        .onDisappear {
+            // Save the user's choice when leaving this step
+            saveLaunchAtLogin()
+        }
+    }
+
+    private func enableLaunchAtLogin() {
+        launchAtLogin = true
+    }
+
+    private func saveLaunchAtLogin() {
+        var settings = Defaults.shared.appSettings
+        settings.launchAtLogin = launchAtLogin
+        Defaults.shared.appSettings = settings
+
+        do {
+            if launchAtLogin {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            NSLog("[MakLock] Failed to set login item: %@", error.localizedDescription)
         }
     }
 }

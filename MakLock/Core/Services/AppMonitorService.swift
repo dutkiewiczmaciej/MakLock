@@ -13,11 +13,9 @@ final class AppMonitorService: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    /// Apps that have been authenticated recently. Key: bundleIdentifier, Value: auth timestamp.
-    private var authenticatedApps: [String: Date] = [:]
-
-    /// Grace period after authentication during which the app won't be re-locked.
-    private let gracePeriod: TimeInterval = 5
+    /// Apps that have been authenticated in the current session.
+    /// These will NOT be re-locked until explicitly cleared (idle, sleep, manual).
+    private var authenticatedApps: Set<String> = []
 
     private init() {}
 
@@ -50,21 +48,26 @@ final class AppMonitorService: ObservableObject {
         NSLog("[MakLock] App monitor stopped")
     }
 
-    /// Mark an app as authenticated (won't re-lock until session expires or is cleared).
+    /// Mark an app as authenticated. It stays unlocked until session is cleared.
     func markAuthenticated(_ bundleIdentifier: String) {
-        authenticatedApps[bundleIdentifier] = Date()
-        NSLog("[MakLock] App authenticated, grace period started: %@", bundleIdentifier)
+        authenticatedApps.insert(bundleIdentifier)
+        NSLog("[MakLock] App session authenticated: %@", bundleIdentifier)
     }
 
-    /// Clear authentication for all apps (e.g., on idle lock, sleep lock).
+    /// Clear all authentication sessions (called on idle timeout, sleep, Watch out of range).
     func clearAllAuthentications() {
         authenticatedApps.removeAll()
-        NSLog("[MakLock] All app authentications cleared")
+        NSLog("[MakLock] All app sessions cleared")
     }
 
     /// Clear authentication for a specific app.
     func clearAuthentication(for bundleIdentifier: String) {
-        authenticatedApps.removeValue(forKey: bundleIdentifier)
+        authenticatedApps.remove(bundleIdentifier)
+    }
+
+    /// Check if an app is currently authenticated.
+    func isAuthenticated(_ bundleIdentifier: String) -> Bool {
+        authenticatedApps.contains(bundleIdentifier)
     }
 
     private func handleAppEvent(_ runningApp: NSRunningApplication) {
@@ -83,15 +86,8 @@ final class AppMonitorService: ObservableObject {
         let settings = Defaults.shared.appSettings
         guard settings.isProtectionEnabled else { return }
 
-        // Skip if app was recently authenticated (grace period)
-        if let authDate = authenticatedApps[bundleID] {
-            let elapsed = Date().timeIntervalSince(authDate)
-            if elapsed < gracePeriod {
-                return
-            }
-            // Grace period expired — remove and re-lock
-            authenticatedApps.removeValue(forKey: bundleID)
-        }
+        // Skip if app is already authenticated in this session
+        guard !authenticatedApps.contains(bundleID) else { return }
 
         // Don't show overlay if one is already showing
         guard !OverlayWindowService.shared.isShowing else { return }
