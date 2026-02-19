@@ -9,12 +9,15 @@ struct GeneralSettingsView: View {
         Form {
             Section {
                 Toggle("Launch MakLock at login", isOn: $settings.launchAtLogin)
+                    .toggleStyle(.goldSwitch)
 
                 Toggle("Lock apps when Mac sleeps", isOn: $settings.lockOnSleep)
+                    .toggleStyle(.goldSwitch)
             }
 
             Section {
                 Toggle("Lock apps after idle timeout", isOn: $settings.lockOnIdle)
+                    .toggleStyle(.goldSwitch)
 
                 if settings.lockOnIdle {
                     HStack {

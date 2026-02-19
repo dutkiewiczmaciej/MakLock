@@ -13,6 +13,7 @@
 		A10000000000000000000101 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000111 /* Colors.swift */; };
 		A10000000000000000000102 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* Typography.swift */; };
 		A10000000000000000000103 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000113 /* Animations.swift */; };
+		A10000000000000000000108 /* ToggleStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000118 /* ToggleStyles.swift */; };
 		A10000000000000000000104 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000114 /* BlurView.swift */; };
 		A10000000000000000000105 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000115 /* PrimaryButton.swift */; };
 		A10000000000000000000106 /* SecondaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000116 /* SecondaryButton.swift */; };
@@ -59,6 +60,7 @@
 		A10000000000000000000111 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		A10000000000000000000112 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		A10000000000000000000113 /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
+		A10000000000000000000118 /* ToggleStyles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleStyles.swift; sourceTree = "<group>"; };
 		A10000000000000000000114 /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
 		A10000000000000000000115 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		A10000000000000000000116 /* SecondaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButton.swift; sourceTree = "<group>"; };
@@ -198,6 +200,7 @@
 				A10000000000000000000111 /* Colors.swift */,
 				A10000000000000000000112 /* Typography.swift */,
 				A10000000000000000000113 /* Animations.swift */,
+				A10000000000000000000118 /* ToggleStyles.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
@@ -372,6 +375,7 @@
 				A10000000000000000000101 /* Colors.swift in Sources */,
 				A10000000000000000000102 /* Typography.swift in Sources */,
 				A10000000000000000000103 /* Animations.swift in Sources */,
+				A10000000000000000000108 /* ToggleStyles.swift in Sources */,
 				A10000000000000000000104 /* BlurView.swift in Sources */,
 				A10000000000000000000105 /* PrimaryButton.swift in Sources */,
 				A10000000000000000000106 /* SecondaryButton.swift in Sources */,

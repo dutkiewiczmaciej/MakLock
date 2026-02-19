@@ -36,8 +36,7 @@ struct MenuBarView: View {
                     .foregroundColor(.secondary)
                 Spacer()
                 Toggle("", isOn: $isProtectionEnabled)
-                    .toggleStyle(.switch)
-                    .controlSize(.small)
+                    .toggleStyle(.goldSwitchSmall)
                     .labelsHidden()
                     .onChange(of: isProtectionEnabled) { _ in
                         onToggleProtection()

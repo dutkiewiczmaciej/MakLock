@@ -330,7 +330,7 @@ private struct FinalStep: View {
 
             VStack(spacing: 12) {
                 Toggle("Launch MakLock at login", isOn: $launchAtLogin)
-                    .toggleStyle(.switch)
+                    .toggleStyle(.goldSwitch)
 
                 Text("You can also configure idle auto-lock\nand other options in Settings.")
                     .font(MakLockTypography.caption)

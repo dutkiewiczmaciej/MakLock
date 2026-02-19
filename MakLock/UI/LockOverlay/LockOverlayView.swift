@@ -5,6 +5,7 @@ import SwiftUI
 struct LockOverlayView: View {
     let appName: String
     let bundleIdentifier: String
+    let isPrimary: Bool
     let onDismiss: () -> Void
 
     @State private var isVisible = false
@@ -103,9 +104,11 @@ struct LockOverlayView: View {
             withAnimation(MakLockAnimations.overlayAppear) {
                 isVisible = true
             }
-            // Auto-trigger Touch ID after overlay animation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                attemptTouchID()
+            // Only the primary screen triggers Touch ID (prevents duplicate system prompts)
+            if isPrimary {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    attemptTouchID()
+                }
             }
         }
     }

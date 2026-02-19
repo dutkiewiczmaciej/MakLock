@@ -62,7 +62,7 @@ struct AppsSettingsView: View {
                         get: { app.isEnabled },
                         set: { _ in manager.toggleApp(app) }
                     ))
-                    .toggleStyle(.switch)
+                    .toggleStyle(.goldSwitch)
                     .labelsHidden()
 
                     Button(action: { manager.removeApp(app) }) {

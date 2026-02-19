@@ -43,6 +43,9 @@ final class OverlayWindowService {
     func hide() {
         stopTimeoutTimer()
 
+        // Cancel any in-progress Touch ID evaluation
+        AuthenticationService.shared.cancelAuthentication()
+
         // Mark the app as authenticated so it won't re-lock immediately
         if let app = currentApp {
             AppMonitorService.shared.markAuthenticated(app.bundleIdentifier)
@@ -79,22 +82,55 @@ final class OverlayWindowService {
     // MARK: - Screen Management
 
     @objc private func screensDidChange(_ notification: Notification) {
-        guard let app = currentApp, !overlayWindows.isEmpty else { return }
+        guard !overlayWindows.isEmpty else { return }
 
-        // Rebuild overlays for the new screen configuration
-        overlayWindows.forEach { $0.close() }
-        overlayWindows.removeAll()
-        createOverlayWindows(for: app)
-        NSLog("[MakLock] Overlays repositioned for screen change (%d screens)", NSScreen.screens.count)
+        let screens = NSScreen.screens
+
+        // Reposition existing windows to match current screens (don't recreate to avoid re-triggering Touch ID)
+        for (index, window) in overlayWindows.enumerated() {
+            if index < screens.count {
+                window.reposition(to: screens[index])
+            }
+        }
+
+        // Close excess windows if screens were removed
+        while overlayWindows.count > screens.count {
+            overlayWindows.removeLast().close()
+        }
+
+        // Add new windows for new screens (only blur, no Touch ID trigger)
+        if let app = currentApp {
+            for screenIndex in overlayWindows.count..<screens.count {
+                let window = LockOverlayWindow(for: screens[screenIndex])
+                let overlayView = LockOverlayView(
+                    appName: app.name,
+                    bundleIdentifier: app.bundleIdentifier,
+                    isPrimary: false,
+                    onDismiss: { [weak self] in
+                        self?.hide()
+                        self?.onUnlocked?()
+                    }
+                )
+                window.contentView = NSHostingView(rootView: overlayView)
+                window.orderFront(nil)
+                overlayWindows.append(window)
+            }
+        }
+
+        NSLog("[MakLock] Overlays repositioned for screen change (%d screens)", screens.count)
     }
 
     private func createOverlayWindows(for app: ProtectedApp) {
+        let primaryScreen = NSScreen.main ?? NSScreen.screens.first
+
         for screen in NSScreen.screens {
             let window = LockOverlayWindow(for: screen)
+            let isPrimary = (screen == primaryScreen)
 
             let overlayView = LockOverlayView(
                 appName: app.name,
                 bundleIdentifier: app.bundleIdentifier,
+                isPrimary: isPrimary,
                 onDismiss: { [weak self] in
                     self?.hide()
                     self?.onUnlocked?()
@@ -102,9 +138,8 @@ final class OverlayWindowService {
             )
 
             window.contentView = NSHostingView(rootView: overlayView)
-            // Don't make key — system Touch ID dialog needs key status for fingerprint
+            // Don't make key or activate — system Touch ID dialog needs focus
             window.orderFront(nil)
-            window.orderFrontRegardless()
             overlayWindows.append(window)
         }
     }

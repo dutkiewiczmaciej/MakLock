@@ -17,6 +17,10 @@ final class AppMonitorService: ObservableObject {
     /// Cleared when the app terminates, on idle timeout, sleep, or manual clear.
     private var authenticatedApps: Set<String> = []
 
+    /// Bundle IDs that have a pending overlay prompt (not yet authenticated or cancelled).
+    /// Prevents checkRunningApps from triggering duplicate prompts.
+    private var pendingLockBundleIDs: Set<String> = []
+
     private init() {}
 
     /// Start monitoring app launches and activations.
@@ -44,6 +48,7 @@ final class AppMonitorService: ObservableObject {
             .compactMap { $0.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication }
             .sink { [weak self] app in
                 guard let bundleID = app.bundleIdentifier else { return }
+                self?.pendingLockBundleIDs.remove(bundleID)
                 if self?.authenticatedApps.contains(bundleID) == true {
                     self?.authenticatedApps.remove(bundleID)
                     NSLog("[MakLock] App terminated, auth cleared: %@", bundleID)
@@ -77,6 +82,7 @@ final class AppMonitorService: ObservableObject {
                 $0.bundleIdentifier == bundleID && $0.isEnabled
             }) {
                 guard !authenticatedApps.contains(bundleID) else { continue }
+                guard !pendingLockBundleIDs.contains(bundleID) else { continue }
                 guard !OverlayWindowService.shared.isShowing else { continue }
 
                 NSLog("[MakLock] Found running protected app: %@ (%@)", protectedApp.name, bundleID)
@@ -96,12 +102,14 @@ final class AppMonitorService: ObservableObject {
     /// Mark an app as authenticated. It stays unlocked until the app quits, idle, or sleep.
     func markAuthenticated(_ bundleIdentifier: String) {
         authenticatedApps.insert(bundleIdentifier)
+        pendingLockBundleIDs.remove(bundleIdentifier)
         NSLog("[MakLock] App session authenticated: %@", bundleIdentifier)
     }
 
     /// Clear all authentication sessions (called on idle timeout, sleep, Watch out of range).
     func clearAllAuthentications() {
         authenticatedApps.removeAll()
+        pendingLockBundleIDs.removeAll()
         NSLog("[MakLock] All app sessions cleared")
     }
 
@@ -137,7 +145,11 @@ final class AppMonitorService: ObservableObject {
         // Don't show overlay if one is already showing
         guard !OverlayWindowService.shared.isShowing else { return }
 
+        // Don't trigger if a prompt is already pending for this app
+        guard !pendingLockBundleIDs.contains(bundleID) else { return }
+
         NSLog("[MakLock] Protected app detected: %@ (%@)", protectedApp.name, bundleID)
+        pendingLockBundleIDs.insert(bundleID)
         detectedApp = protectedApp
         onProtectedAppDetected?(protectedApp)
     }
