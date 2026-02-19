@@ -1,14 +1,21 @@
 import SwiftUI
 
 /// The lock overlay UI: blur background with centered unlock card.
+/// Touch ID triggers automatically on appear — no user interaction needed for the happy path.
 struct LockOverlayView: View {
     let appName: String
     let bundleIdentifier: String
-    let onUnlock: () -> Void
     let onDismiss: () -> Void
 
     @State private var isVisible = false
     @State private var showPasswordInput = false
+    @State private var authState: AuthState = .authenticating
+    @State private var errorMessage: String?
+
+    private enum AuthState {
+        case authenticating
+        case waitingForUser
+    }
 
     var body: some View {
         ZStack {
@@ -41,20 +48,32 @@ struct LockOverlayView: View {
                         .font(MakLockTypography.largeTitle)
                         .foregroundColor(MakLockColors.textPrimary)
 
-                    Text("Use Touch ID to unlock")
-                        .font(MakLockTypography.body)
-                        .foregroundColor(MakLockColors.textSecondary)
+                    if authState == .authenticating {
+                        // Touch ID in progress
+                        ProgressView()
+                            .controlSize(.regular)
+                            .padding(.top, 4)
 
-                    // Unlock button
-                    PrimaryButton("Unlock", icon: "touchid") {
-                        onUnlock()
-                    }
-                    .padding(.top, 4)
+                        Text("Authenticating...")
+                            .font(MakLockTypography.body)
+                            .foregroundColor(MakLockColors.textSecondary)
+                    } else {
+                        // Touch ID failed or cancelled — show options
+                        if let errorMessage {
+                            Text(errorMessage)
+                                .font(MakLockTypography.caption)
+                                .foregroundColor(MakLockColors.error)
+                        }
 
-                    // Password fallback
-                    SecondaryButton("Use Password Instead") {
-                        withAnimation(MakLockAnimations.standard) {
-                            showPasswordInput = true
+                        PrimaryButton("Try Again", icon: "touchid") {
+                            attemptTouchID()
+                        }
+                        .padding(.top, 4)
+
+                        SecondaryButton("Use Password Instead") {
+                            withAnimation(MakLockAnimations.standard) {
+                                showPasswordInput = true
+                            }
                         }
                     }
 
@@ -82,6 +101,29 @@ struct LockOverlayView: View {
         .onAppear {
             withAnimation(MakLockAnimations.overlayAppear) {
                 isVisible = true
+            }
+            // Auto-trigger Touch ID after overlay animation
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                attemptTouchID()
+            }
+        }
+    }
+
+    private func attemptTouchID() {
+        authState = .authenticating
+        errorMessage = nil
+
+        AuthenticationService.shared.authenticateWithTouchID(
+            reason: "Unlock \(appName)"
+        ) { result in
+            switch result {
+            case .success:
+                onDismiss()
+            case .failure(let error):
+                authState = .waitingForUser
+                errorMessage = error.localizedDescription
+            case .cancelled:
+                authState = .waitingForUser
             }
         }
     }

@@ -9,11 +9,8 @@ final class OverlayWindowService {
     private var timeoutTimer: Timer?
     private var currentApp: ProtectedApp?
 
-    /// Callback when the user requests unlock (Touch ID or password).
-    var onUnlockRequested: ((ProtectedApp) -> Void)?
-
-    /// Callback when the user requests password input.
-    var onPasswordRequested: ((ProtectedApp) -> Void)?
+    /// Callback when overlay is dismissed after successful authentication.
+    var onUnlocked: (() -> Void)?
 
     private init() {
         // Observe screen configuration changes (connect/disconnect monitors)
@@ -74,11 +71,9 @@ final class OverlayWindowService {
             let overlayView = LockOverlayView(
                 appName: app.name,
                 bundleIdentifier: app.bundleIdentifier,
-                onUnlock: { [weak self] in
-                    self?.handleUnlock()
-                },
                 onDismiss: { [weak self] in
                     self?.hide()
+                    self?.onUnlocked?()
                 }
             )
 
@@ -106,10 +101,4 @@ final class OverlayWindowService {
         timeoutTimer = nil
     }
 
-    // MARK: - Private
-
-    private func handleUnlock() {
-        guard let app = currentApp else { return }
-        onUnlockRequested?(app)
-    }
 }
