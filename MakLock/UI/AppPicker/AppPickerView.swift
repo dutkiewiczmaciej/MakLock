@@ -113,8 +113,9 @@ struct AppPickerView: View {
                       !SafetyManager.isBlacklisted(bundleID),
                       !alreadyProtected.contains(bundleID) else { continue }
 
-                let name = bundle.object(forInfoDictionaryKey: "CFBundleName") as? String
-                    ?? item.replacingOccurrences(of: ".app", with: "")
+                // Use localized display name (works with any system language)
+                let name = FileManager.default.displayName(atPath: path)
+                    .replacingOccurrences(of: ".app", with: "")
 
                 apps.append(AppInfo(
                     bundleIdentifier: bundleID,

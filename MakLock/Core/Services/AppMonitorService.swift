@@ -13,6 +13,10 @@ final class AppMonitorService: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    /// Apps that have been authenticated in the current session.
+    /// These will NOT be re-locked until explicitly cleared (idle, sleep, manual).
+    private var authenticatedApps: Set<String> = []
+
     private init() {}
 
     /// Start monitoring app launches and activations.
@@ -44,6 +48,28 @@ final class AppMonitorService: ObservableObject {
         NSLog("[MakLock] App monitor stopped")
     }
 
+    /// Mark an app as authenticated. It stays unlocked until session is cleared.
+    func markAuthenticated(_ bundleIdentifier: String) {
+        authenticatedApps.insert(bundleIdentifier)
+        NSLog("[MakLock] App session authenticated: %@", bundleIdentifier)
+    }
+
+    /// Clear all authentication sessions (called on idle timeout, sleep, Watch out of range).
+    func clearAllAuthentications() {
+        authenticatedApps.removeAll()
+        NSLog("[MakLock] All app sessions cleared")
+    }
+
+    /// Clear authentication for a specific app.
+    func clearAuthentication(for bundleIdentifier: String) {
+        authenticatedApps.remove(bundleIdentifier)
+    }
+
+    /// Check if an app is currently authenticated.
+    func isAuthenticated(_ bundleIdentifier: String) -> Bool {
+        authenticatedApps.contains(bundleIdentifier)
+    }
+
     private func handleAppEvent(_ runningApp: NSRunningApplication) {
         guard let bundleID = runningApp.bundleIdentifier else { return }
 
@@ -59,6 +85,12 @@ final class AppMonitorService: ObservableObject {
         // Check if global protection is enabled
         let settings = Defaults.shared.appSettings
         guard settings.isProtectionEnabled else { return }
+
+        // Skip if app is already authenticated in this session
+        guard !authenticatedApps.contains(bundleID) else { return }
+
+        // Don't show overlay if one is already showing
+        guard !OverlayWindowService.shared.isShowing else { return }
 
         NSLog("[MakLock] Protected app detected: %@ (%@)", protectedApp.name, bundleID)
         detectedApp = protectedApp

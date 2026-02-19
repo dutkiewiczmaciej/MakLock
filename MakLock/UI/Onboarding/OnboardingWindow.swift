@@ -31,15 +31,20 @@ final class OnboardingWindowController {
 
         let newWindow = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 480, height: 420),
-            styleMask: [.titled, .closable],
+            styleMask: [.titled],
             backing: .buffered,
             defer: false
         )
         newWindow.title = "Welcome to MakLock"
         newWindow.contentView = hostingView
         newWindow.isReleasedWhenClosed = false
+        newWindow.level = .floating
         newWindow.center()
         newWindow.makeKeyAndOrderFront(nil)
+        newWindow.orderFrontRegardless()
+
+        // Menu bar apps (LSUIElement) run in background — must activate explicitly
+        NSApp.activate(ignoringOtherApps: true)
 
         window = newWindow
     }
