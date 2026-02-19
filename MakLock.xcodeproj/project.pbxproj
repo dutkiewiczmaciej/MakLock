@@ -21,6 +21,8 @@
 		A10000000000000000000202 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000212 /* AppSettings.swift */; };
 		A10000000000000000000203 /* LockSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000213 /* LockSession.swift */; };
 		A10000000000000000000204 /* AuthMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000214 /* AuthMethod.swift */; };
+		A10000000000000000000205 /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000215 /* Defaults.swift */; };
+		A10000000000000000000206 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000216 /* KeychainManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +42,8 @@
 		A10000000000000000000212 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		A10000000000000000000213 /* LockSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockSession.swift; sourceTree = "<group>"; };
 		A10000000000000000000214 /* AuthMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthMethod.swift; sourceTree = "<group>"; };
+		A10000000000000000000215 /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
+		A10000000000000000000216 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +113,8 @@
 		A100000000000000000000C3 /* Storage */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000215 /* Defaults.swift */,
+				A10000000000000000000216 /* KeychainManager.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -291,6 +297,8 @@
 				A10000000000000000000202 /* AppSettings.swift in Sources */,
 				A10000000000000000000203 /* LockSession.swift in Sources */,
 				A10000000000000000000204 /* AuthMethod.swift in Sources */,
+				A10000000000000000000205 /* Defaults.swift in Sources */,
+				A10000000000000000000206 /* KeychainManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
