@@ -4,5 +4,7 @@
 <dict>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>MakLock uses Bluetooth to detect your Apple Watch for proximity unlock.</string>
 </dict>
 </plist>
