@@ -48,7 +48,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             _ = self
         }
 
-        // Start monitoring
+        // Start app monitoring
         AppMonitorService.shared.startMonitoring()
+
+        // Wire up idle monitor → lock all protected apps
+        IdleMonitorService.shared.onIdleTimeoutReached = { [weak self] in
+            guard let self else { return }
+            let apps = ProtectedAppsManager.shared.apps.filter(\.isEnabled)
+            for app in apps {
+                OverlayWindowService.shared.show(for: app)
+            }
+            if !apps.isEmpty {
+                self.menuBarController.iconState = .locked
+            }
+        }
+
+        // Start idle monitoring if enabled
+        if Defaults.shared.appSettings.lockOnIdle {
+            IdleMonitorService.shared.startMonitoring()
+        }
     }
 }
