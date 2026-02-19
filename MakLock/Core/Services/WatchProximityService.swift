@@ -20,6 +20,17 @@ final class WatchProximityService: NSObject, ObservableObject {
     /// Whether BLE scanning is active.
     @Published private(set) var isScanning = false
 
+    /// Current Bluetooth authorization status.
+    @Published private(set) var bluetoothState: BluetoothState = .unknown
+
+    enum BluetoothState {
+        case unknown
+        case poweredOn
+        case poweredOff
+        case unauthorized
+        case unsupported
+    }
+
     /// The paired Watch peripheral identifier (persisted).
     @Published var pairedWatchIdentifier: UUID? {
         didSet {
@@ -115,9 +126,17 @@ final class WatchProximityService: NSObject, ObservableObject {
 
 extension WatchProximityService: CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        switch central.state {
+        case .poweredOn: bluetoothState = .poweredOn
+        case .poweredOff: bluetoothState = .poweredOff
+        case .unauthorized: bluetoothState = .unauthorized
+        case .unsupported: bluetoothState = .unsupported
+        default: bluetoothState = .unknown
+        }
+
         guard central.state == .poweredOn else {
             if central.state == .unauthorized {
-                NSLog("[MakLock] Bluetooth access not authorized")
+                NSLog("[MakLock] Bluetooth access not authorized — open System Settings → Privacy & Security → Bluetooth")
             }
             return
         }
