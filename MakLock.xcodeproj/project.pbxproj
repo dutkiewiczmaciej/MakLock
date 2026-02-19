@@ -45,6 +45,8 @@
 		A10000000000000000000A01 /* IdleMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000A11 /* IdleMonitorService.swift */; };
 		A10000000000000000000B01 /* SleepWakeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000B11 /* SleepWakeService.swift */; };
 		A10000000000000000000C01 /* WatchProximityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000C11 /* WatchProximityService.swift */; };
+		A10000000000000000000D01 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000D11 /* OnboardingView.swift */; };
+		A10000000000000000000D02 /* OnboardingWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000D12 /* OnboardingWindow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +90,8 @@
 		A10000000000000000000A11 /* IdleMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleMonitorService.swift; sourceTree = "<group>"; };
 		A10000000000000000000B11 /* SleepWakeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepWakeService.swift; sourceTree = "<group>"; };
 		A10000000000000000000C11 /* WatchProximityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchProximityService.swift; sourceTree = "<group>"; };
+		A10000000000000000000D11 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		A10000000000000000000D12 /* OnboardingWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +185,7 @@
 				A100000000000000000000D4 /* Settings */,
 				A100000000000000000000D5 /* LockOverlay */,
 				A100000000000000000000D6 /* AppPicker */,
+				A100000000000000000000D7 /* Onboarding */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -245,6 +250,15 @@
 				A10000000000000000000712 /* AppPickerWindow.swift */,
 			);
 			path = AppPicker;
+			sourceTree = "<group>";
+		};
+		A100000000000000000000D7 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000D11 /* OnboardingView.swift */,
+				A10000000000000000000D12 /* OnboardingWindow.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		A100000000000000000000E0 /* Models */ = {
@@ -387,6 +401,8 @@
 				A10000000000000000000A01 /* IdleMonitorService.swift in Sources */,
 				A10000000000000000000B01 /* SleepWakeService.swift in Sources */,
 				A10000000000000000000C01 /* WatchProximityService.swift in Sources */,
+				A10000000000000000000D01 /* OnboardingView.swift in Sources */,
+				A10000000000000000000D02 /* OnboardingWindow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
