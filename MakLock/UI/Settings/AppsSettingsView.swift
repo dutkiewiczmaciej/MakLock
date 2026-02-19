@@ -1,0 +1,74 @@
+import SwiftUI
+
+/// Apps settings tab: manage the list of protected applications.
+struct AppsSettingsView: View {
+    @State private var protectedApps: [ProtectedApp] = []
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Protected Applications")
+                .font(MakLockTypography.title)
+
+            if protectedApps.isEmpty {
+                emptyState
+            } else {
+                appsList
+            }
+
+            Spacer()
+
+            HStack {
+                Spacer()
+                PrimaryButton("Add App", icon: "plus") {
+                    // App picker will be connected in Task 8
+                }
+            }
+        }
+        .padding()
+        .onAppear {
+            protectedApps = Defaults.shared.protectedApps
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Spacer()
+            Image(systemName: "lock.open")
+                .font(.system(size: 40))
+                .foregroundColor(MakLockColors.textSecondary)
+            Text("No protected apps yet")
+                .font(MakLockTypography.headline)
+                .foregroundColor(.secondary)
+            Text("Add apps to protect them with Touch ID or password.")
+                .font(MakLockTypography.caption)
+                .foregroundColor(.secondary)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var appsList: some View {
+        List {
+            ForEach($protectedApps) { $app in
+                HStack(spacing: 12) {
+                    AppIconView(bundleIdentifier: app.bundleIdentifier, size: 32)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(app.name)
+                            .font(MakLockTypography.headline)
+                        Text(app.bundleIdentifier)
+                            .font(MakLockTypography.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Toggle("", isOn: $app.isEnabled)
+                        .toggleStyle(.switch)
+                }
+                .padding(.vertical, 4)
+            }
+            .onDelete { indexSet in
+                protectedApps.remove(atOffsets: indexSet)
+                Defaults.shared.protectedApps = protectedApps
+            }
+        }
+    }
+}
