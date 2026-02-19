@@ -40,6 +40,20 @@ final class AppMonitorService: ObservableObject {
             .store(in: &cancellables)
 
         NSLog("[MakLock] App monitor started")
+
+        // Check already-running protected apps (e.g. after MakLock restart)
+        // Delay briefly to let the UI finish loading
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            self?.checkRunningApps()
+        }
+    }
+
+    /// Scan currently running apps and trigger lock for any protected ones.
+    private func checkRunningApps() {
+        let workspace = NSWorkspace.shared
+        for runningApp in workspace.runningApplications {
+            handleAppEvent(runningApp)
+        }
     }
 
     /// Stop monitoring.

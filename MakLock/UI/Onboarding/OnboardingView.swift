@@ -180,11 +180,9 @@ private struct KeyCap: View {
                         .shadow(color: .black.opacity(0.4), radius: 1, y: 2)
                 )
 
-            if let label {
-                Text(label)
-                    .font(.system(size: 8))
-                    .foregroundColor(MakLockColors.textSecondary)
-            }
+            Text(label ?? " ")
+                .font(.system(size: 8))
+                .foregroundColor(label != nil ? MakLockColors.textSecondary : .clear)
         }
     }
 }
@@ -333,7 +331,6 @@ private struct FinalStep: View {
             VStack(spacing: 12) {
                 Toggle("Launch MakLock at login", isOn: $launchAtLogin)
                     .toggleStyle(.switch)
-                    .tint(MakLockColors.gold)
 
                 Text("You can also configure idle auto-lock\nand other options in Settings.")
                     .font(MakLockTypography.caption)

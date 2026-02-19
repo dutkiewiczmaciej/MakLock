@@ -63,7 +63,6 @@ struct AppsSettingsView: View {
                         set: { _ in manager.toggleApp(app) }
                     ))
                     .toggleStyle(.switch)
-                    .tint(MakLockColors.gold)
 
                     Button(action: { manager.removeApp(app) }) {
                         Image(systemName: "trash")
