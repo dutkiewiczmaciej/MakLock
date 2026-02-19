@@ -23,6 +23,7 @@
 		A10000000000000000000204 /* AuthMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000214 /* AuthMethod.swift */; };
 		A10000000000000000000205 /* Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000215 /* Defaults.swift */; };
 		A10000000000000000000206 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000216 /* KeychainManager.swift */; };
+		A10000000000000000000301 /* SafetyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000311 /* SafetyManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		A10000000000000000000214 /* AuthMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthMethod.swift; sourceTree = "<group>"; };
 		A10000000000000000000215 /* Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Defaults.swift; sourceTree = "<group>"; };
 		A10000000000000000000216 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
+		A10000000000000000000311 /* SafetyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafetyManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,6 +108,7 @@
 		A100000000000000000000C2 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000311 /* SafetyManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -299,6 +302,7 @@
 				A10000000000000000000204 /* AuthMethod.swift in Sources */,
 				A10000000000000000000205 /* Defaults.swift in Sources */,
 				A10000000000000000000206 /* KeychainManager.swift in Sources */,
+				A10000000000000000000301 /* SafetyManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
