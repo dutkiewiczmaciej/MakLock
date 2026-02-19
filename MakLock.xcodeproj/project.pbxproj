@@ -33,6 +33,8 @@
 		A10000000000000000000504 /* AppsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000514 /* AppsSettingsView.swift */; };
 		A10000000000000000000505 /* SecuritySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000515 /* SecuritySettingsView.swift */; };
 		A10000000000000000000506 /* WatchSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000516 /* WatchSettingsView.swift */; };
+		A10000000000000000000601 /* AppMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000611 /* AppMonitorService.swift */; };
+		A10000000000000000000602 /* ProtectedAppsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000612 /* ProtectedAppsManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +66,8 @@
 		A10000000000000000000514 /* AppsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppsSettingsView.swift; sourceTree = "<group>"; };
 		A10000000000000000000515 /* SecuritySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuritySettingsView.swift; sourceTree = "<group>"; };
 		A10000000000000000000516 /* WatchSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSettingsView.swift; sourceTree = "<group>"; };
+		A10000000000000000000611 /* AppMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMonitorService.swift; sourceTree = "<group>"; };
+		A10000000000000000000612 /* ProtectedAppsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtectedAppsManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +124,7 @@
 		A100000000000000000000C1 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000611 /* AppMonitorService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -128,6 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000311 /* SafetyManager.swift */,
+				A10000000000000000000612 /* ProtectedAppsManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -339,6 +345,8 @@
 				A10000000000000000000504 /* AppsSettingsView.swift in Sources */,
 				A10000000000000000000505 /* SecuritySettingsView.swift in Sources */,
 				A10000000000000000000506 /* WatchSettingsView.swift in Sources */,
+				A10000000000000000000601 /* AppMonitorService.swift in Sources */,
+				A10000000000000000000602 /* ProtectedAppsManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
