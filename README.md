@@ -36,25 +36,44 @@ MakLock is a lightweight menu bar app that protects your macOS applications with
 
 ## Features
 
-- [ ] Menu bar app (no Dock icon)
-- [ ] Lock apps with Touch ID
-- [ ] Password fallback
-- [ ] Full-screen blur overlay
-- [ ] Auto-lock after idle timeout
-- [ ] Auto-lock on sleep/wake
-- [ ] Apple Watch proximity unlock
-- [ ] Panic key emergency exit
-- [ ] System app blacklist (never locks Terminal, Xcode, etc.)
+- [x] Menu bar app (no Dock icon)
+- [x] Lock apps with Touch ID
+- [x] Password fallback
+- [x] Full-screen blur overlay
+- [x] Auto-lock after idle timeout
+- [x] Auto-lock on sleep/wake
+- [x] Apple Watch proximity unlock
+- [x] Panic key emergency exit
+- [x] System app blacklist (never locks Terminal, Xcode, etc.)
+- [x] Multi-monitor support
+- [x] First launch onboarding
+- [x] Settings with tabbed UI
+- [x] Quick protection toggle from menu bar
 
 ## Screenshots
 
-> Coming soon.
+<p align="center">
+  <img src="Resources/screenshots/overlay.png" width="720" alt="Lock overlay">
+  <br><em>Full-screen blur overlay with Touch ID unlock</em>
+</p>
+
+<p align="center">
+  <img src="Resources/screenshots/settings.png" width="560" alt="Settings window">
+  <br><em>Settings with protected apps management</em>
+</p>
+
+<p align="center">
+  <img src="Resources/screenshots/menubar.png" width="280" alt="Menu bar">
+  <br><em>Menu bar with quick toggle and status</em>
+</p>
 
 ## Installation
 
 ### Download
 
-> First release coming soon. Download the latest `.dmg` from [Releases](https://github.com/dutkiewiczmaciej/maklock/releases).
+Download the latest `.dmg` from [**Releases**](https://github.com/dutkiewiczmaciej/maklock/releases/latest).
+
+> MakLock is notarized by Apple for safe distribution outside the App Store.
 
 ### Build from Source
 
@@ -72,7 +91,7 @@ MakLock is a native Swift/SwiftUI application distributed outside the App Store 
 
 ```
 MakLock/
-  App/        Entry point, AppDelegate, AppState
+  App/        Entry point, AppDelegate
   Core/       Services, Managers, Storage
   UI/         Design system, Components, Views
   Models/     Data models
@@ -80,6 +99,13 @@ MakLock/
 ```
 
 **Key frameworks:** SwiftUI, AppKit, LocalAuthentication, CoreBluetooth, IOKit, HotKey (SPM)
+
+## How It Works
+
+1. **App Monitor** — watches for protected app launches via NSWorkspace notifications
+2. **Lock Overlay** — shows a full-screen blur overlay on all displays
+3. **Authentication** — prompts for Touch ID (or password fallback)
+4. **Auto-lock** — re-locks on idle timeout, sleep, or Apple Watch out of range
 
 ## Safety
 
