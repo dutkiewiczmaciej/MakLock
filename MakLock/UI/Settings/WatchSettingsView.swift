@@ -8,19 +8,24 @@ struct WatchSettingsView: View {
 
     var body: some View {
         Form {
+            // Bluetooth status
             Section {
-                Toggle("Use Apple Watch to unlock", isOn: $settings.useWatchUnlock)
-                    .onChange(of: settings.useWatchUnlock) { enabled in
-                        Defaults.shared.appSettings = settings
-                        if enabled {
-                            watchService.startScanning()
-                        } else {
-                            watchService.stopScanning()
+                bluetoothStatusRow
+
+                if watchService.bluetoothState == .poweredOn || watchService.bluetoothState == .unknown {
+                    Toggle("Use Apple Watch to unlock", isOn: $settings.useWatchUnlock)
+                        .onChange(of: settings.useWatchUnlock) { enabled in
+                            Defaults.shared.appSettings = settings
+                            if enabled {
+                                watchService.startScanning()
+                            } else {
+                                watchService.stopScanning()
+                            }
                         }
-                    }
+                }
             }
 
-            if settings.useWatchUnlock {
+            if settings.useWatchUnlock && watchService.bluetoothState == .poweredOn {
                 Section("Paired Watch") {
                     if let watchID = watchService.pairedWatchIdentifier {
                         HStack {
@@ -61,7 +66,7 @@ struct WatchSettingsView: View {
                         }
                         .padding(.vertical, 4)
 
-                        Text("Make sure Bluetooth is on and your Watch is nearby.")
+                        Text("Make sure your Apple Watch is unlocked, on your wrist, and nearby.")
                             .font(MakLockTypography.caption)
                             .foregroundColor(.secondary)
                     }
@@ -73,7 +78,6 @@ struct WatchSettingsView: View {
                             Text("Range:")
                             Slider(value: $sensitivity, in: 0...100, step: 10)
                                 .onChange(of: sensitivity) { value in
-                                    // Map 0-100 slider to RSSI threshold: -90 (far) to -50 (close)
                                     let rssi = Int(-90 + (value / 100.0) * 40)
                                     watchService.rssiThreshold = rssi
                                 }
@@ -99,10 +103,78 @@ struct WatchSettingsView: View {
         .formStyle(.grouped)
         .padding()
         .onAppear {
-            // Map persisted RSSI threshold back to slider value
             let rssi = Double(watchService.rssiThreshold)
             sensitivity = ((rssi + 90) / 40.0) * 100
         }
+    }
+
+    // MARK: - Bluetooth Status
+
+    @ViewBuilder
+    private var bluetoothStatusRow: some View {
+        switch watchService.bluetoothState {
+        case .poweredOn:
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(MakLockColors.success)
+                Text("Bluetooth is on")
+                    .font(MakLockTypography.body)
+            }
+
+        case .poweredOff:
+            HStack(spacing: 8) {
+                Image(systemName: "bluetooth")
+                    .foregroundColor(MakLockColors.error)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Bluetooth is off")
+                        .font(MakLockTypography.body)
+                    Text("Turn on Bluetooth in System Settings to use Apple Watch unlock.")
+                        .font(MakLockTypography.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            openSettingsButton(label: "Open Bluetooth Settings")
+
+        case .unauthorized:
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundColor(MakLockColors.locked)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Bluetooth Permission Required")
+                        .font(MakLockTypography.body)
+                    Text("MakLock needs Bluetooth access to detect your Apple Watch. Grant permission in System Settings → Privacy & Security → Bluetooth.")
+                        .font(MakLockTypography.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            openSettingsButton(label: "Open Privacy Settings")
+
+        case .unsupported:
+            HStack(spacing: 8) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(MakLockColors.error)
+                Text("Bluetooth is not supported on this Mac")
+                    .font(MakLockTypography.body)
+            }
+
+        case .unknown:
+            HStack(spacing: 8) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("Checking Bluetooth status...")
+                    .font(MakLockTypography.body)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    private func openSettingsButton(label: String) -> some View {
+        Button(label) {
+            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Bluetooth") {
+                NSWorkspace.shared.open(url)
+            }
+        }
+        .font(MakLockTypography.caption)
     }
 
     private var sensitivityLabel: String {
