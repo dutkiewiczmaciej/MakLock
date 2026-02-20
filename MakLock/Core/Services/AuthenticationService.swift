@@ -5,10 +5,22 @@ import Foundation
 final class AuthenticationService {
     static let shared = AuthenticationService()
 
+    /// Whether a Touch ID evaluation is currently in progress.
+    private(set) var isAuthenticating = false
+
+    /// The active LAContext — kept so it can be cancelled on overlay dismiss.
+    private var activeContext: LAContext?
+
     private init() {}
 
     /// Attempt Touch ID authentication.
+    /// Concurrent calls are silently ignored — only one evaluatePolicy at a time.
     func authenticateWithTouchID(reason: String = "Unlock this app", completion: @escaping (AuthResult) -> Void) {
+        guard !isAuthenticating else {
+            NSLog("[MakLock] Touch ID already in progress — ignoring duplicate call")
+            return
+        }
+
         let context = LAContext()
         var error: NSError?
 
@@ -18,8 +30,14 @@ final class AuthenticationService {
             return
         }
 
+        isAuthenticating = true
+        activeContext = context
+
         context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, error in
             DispatchQueue.main.async {
+                self.isAuthenticating = false
+                self.activeContext = nil
+
                 if success {
                     completion(.success)
                 } else if let error = error as? LAError, error.code == .userCancel {
@@ -30,6 +48,13 @@ final class AuthenticationService {
                 }
             }
         }
+    }
+
+    /// Cancel any in-progress Touch ID evaluation (called when overlay is dismissed externally).
+    func cancelAuthentication() {
+        activeContext?.invalidate()
+        activeContext = nil
+        isAuthenticating = false
     }
 
     /// Verify the backup password.

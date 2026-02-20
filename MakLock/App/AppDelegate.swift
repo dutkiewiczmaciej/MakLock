@@ -36,6 +36,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Wire up idle monitor → lock all protected apps
         IdleMonitorService.shared.onIdleTimeoutReached = { [weak self] in
             guard let self else { return }
+            AppMonitorService.shared.clearAllAuthentications()
             let apps = ProtectedAppsManager.shared.apps.filter(\.isEnabled)
             for app in apps {
                 OverlayWindowService.shared.show(for: app)
@@ -53,6 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Wire up sleep/wake → lock all protected apps on sleep
         SleepWakeService.shared.onSleep = { [weak self] in
             guard let self else { return }
+            AppMonitorService.shared.clearAllAuthentications()
             let apps = ProtectedAppsManager.shared.apps.filter(\.isEnabled)
             for app in apps {
                 OverlayWindowService.shared.show(for: app)

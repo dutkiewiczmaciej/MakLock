@@ -22,7 +22,9 @@ final class MenuBarController {
 
     func setup() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        updateIcon()
+
+        // Set initial icon based on protection state
+        iconState = Defaults.shared.appSettings.isProtectionEnabled ? .active : .idle
 
         let popover = NSPopover()
         popover.contentSize = NSSize(width: 260, height: 280)

@@ -36,8 +36,7 @@ struct MenuBarView: View {
                     .foregroundColor(.secondary)
                 Spacer()
                 Toggle("", isOn: $isProtectionEnabled)
-                    .toggleStyle(.switch)
-                    .controlSize(.small)
+                    .toggleStyle(.goldSwitchSmall)
                     .labelsHidden()
                     .onChange(of: isProtectionEnabled) { _ in
                         onToggleProtection()
@@ -107,6 +106,8 @@ private struct MenuBarButton: View {
     let icon: String
     let action: () -> Void
 
+    @State private var isHovered = false
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 10) {
@@ -119,8 +120,16 @@ private struct MenuBarButton: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(isHovered ? Color.primary.opacity(0.1) : Color.clear)
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .onHover { hovering in
+            isHovered = hovering
+        }
+        .padding(.horizontal, 4)
     }
 }

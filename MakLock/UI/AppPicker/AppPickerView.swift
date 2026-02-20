@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import CoreServices
 
 /// Modal view for selecting applications to protect.
 struct AppPickerView: View {
@@ -83,9 +84,11 @@ struct AppPickerView: View {
         if searchText.isEmpty {
             return installedApps
         }
-        return installedApps.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText) ||
-            $0.bundleIdentifier.localizedCaseInsensitiveContains(searchText)
+        let query = searchText
+        return installedApps.filter { app in
+            app.name.localizedCaseInsensitiveContains(query) ||
+            app.bundleIdentifier.localizedCaseInsensitiveContains(query) ||
+            app.searchableNames.contains(where: { $0.localizedCaseInsensitiveContains(query) })
         }
     }
 
@@ -113,13 +116,51 @@ struct AppPickerView: View {
                       !SafetyManager.isBlacklisted(bundleID),
                       !alreadyProtected.contains(bundleID) else { continue }
 
-                let name = bundle.object(forInfoDictionaryKey: "CFBundleName") as? String
-                    ?? item.replacingOccurrences(of: ".app", with: "")
+                // Use localized display name from Spotlight metadata (most reliable)
+                let fileURL = URL(fileURLWithPath: path)
+                var spotlightName: String?
+                if let mdItem = MDItemCreateWithURL(nil, fileURL as CFURL),
+                   let mdName = MDItemCopyAttribute(mdItem, kMDItemDisplayName) as? String {
+                    spotlightName = mdName.replacingOccurrences(of: ".app", with: "")
+                }
+
+                // Fallback to FileManager displayName
+                let displayName = FileManager.default.displayName(atPath: path)
+                    .replacingOccurrences(of: ".app", with: "")
+
+                let name = spotlightName ?? displayName
+
+                // Collect alternative names for search
+                var searchNames: Set<String> = []
+
+                // Filename (always English on macOS, e.g. "Chess")
+                let fileName = (item as NSString).deletingPathExtension
+                searchNames.insert(fileName)
+                searchNames.insert(displayName)
+                if let sn = spotlightName { searchNames.insert(sn) }
+
+                // CFBundleName / CFBundleDisplayName from Info.plist
+                if let bundleName = bundle.infoDictionary?["CFBundleName"] as? String {
+                    searchNames.insert(bundleName)
+                }
+                if let displayName = bundle.infoDictionary?["CFBundleDisplayName"] as? String {
+                    searchNames.insert(displayName)
+                }
+
+                // Localized names from the bundle
+                if let localDict = bundle.localizedInfoDictionary {
+                    if let n = localDict["CFBundleDisplayName"] as? String { searchNames.insert(n) }
+                    if let n = localDict["CFBundleName"] as? String { searchNames.insert(n) }
+                }
+
+                NSLog("[MakLock] App: %@ | display=%@ | spotlight=%@ | searchNames=%@",
+                      bundleID, displayName, spotlightName ?? "nil", searchNames.description)
 
                 apps.append(AppInfo(
                     bundleIdentifier: bundleID,
                     name: name,
-                    path: path
+                    path: path,
+                    searchableNames: Array(searchNames)
                 ))
             }
         }
@@ -136,6 +177,8 @@ struct AppInfo: Identifiable {
     let bundleIdentifier: String
     let name: String
     let path: String
+    /// All localized names (English, Polish, etc.) for search.
+    var searchableNames: [String] = []
 }
 
 // MARK: - Row

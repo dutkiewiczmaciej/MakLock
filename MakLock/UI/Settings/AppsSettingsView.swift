@@ -62,8 +62,17 @@ struct AppsSettingsView: View {
                         get: { app.isEnabled },
                         set: { _ in manager.toggleApp(app) }
                     ))
-                    .toggleStyle(.switch)
+                    .toggleStyle(.goldSwitch)
+                    .labelsHidden()
+
+                    Button(action: { manager.removeApp(app) }) {
+                        Image(systemName: "trash")
+                            .font(.system(size: 12))
+                            .foregroundColor(MakLockColors.error)
+                    }
+                    .buttonStyle(.plain)
                 }
+                .id(app.id)
                 .padding(.vertical, 4)
             }
             .onDelete { indexSet in

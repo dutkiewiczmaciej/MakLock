@@ -5,6 +5,7 @@ import SwiftUI
 struct LockOverlayView: View {
     let appName: String
     let bundleIdentifier: String
+    let isPrimary: Bool
     let onDismiss: () -> Void
 
     @State private var isVisible = false
@@ -71,6 +72,7 @@ struct LockOverlayView: View {
                         .padding(.top, 4)
 
                         SecondaryButton("Use Password Instead") {
+                            OverlayWindowService.shared.enableKeyboardInput()
                             withAnimation(MakLockAnimations.standard) {
                                 showPasswordInput = true
                             }
@@ -102,9 +104,11 @@ struct LockOverlayView: View {
             withAnimation(MakLockAnimations.overlayAppear) {
                 isVisible = true
             }
-            // Auto-trigger Touch ID after overlay animation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                attemptTouchID()
+            // Only the primary screen triggers Touch ID (prevents duplicate system prompts)
+            if isPrimary {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    attemptTouchID()
+                }
             }
         }
     }
@@ -113,9 +117,15 @@ struct LockOverlayView: View {
         authState = .authenticating
         errorMessage = nil
 
+        // Lower overlay level and pass through mouse so system Touch ID dialog gets full focus
+        OverlayWindowService.shared.setTouchIDMode(true)
+
         AuthenticationService.shared.authenticateWithTouchID(
             reason: "Unlock \(appName)"
         ) { result in
+            // Restore overlay level and mouse capture
+            OverlayWindowService.shared.setTouchIDMode(false)
+
             switch result {
             case .success:
                 onDismiss()

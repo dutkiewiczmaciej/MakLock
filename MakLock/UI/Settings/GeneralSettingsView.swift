@@ -1,4 +1,5 @@
 import SwiftUI
+import ServiceManagement
 
 /// General settings tab: launch at login, idle auto-lock, sleep auto-lock.
 struct GeneralSettingsView: View {
@@ -8,12 +9,15 @@ struct GeneralSettingsView: View {
         Form {
             Section {
                 Toggle("Launch MakLock at login", isOn: $settings.launchAtLogin)
+                    .toggleStyle(.goldSwitch)
 
                 Toggle("Lock apps when Mac sleeps", isOn: $settings.lockOnSleep)
+                    .toggleStyle(.goldSwitch)
             }
 
             Section {
                 Toggle("Lock apps after idle timeout", isOn: $settings.lockOnIdle)
+                    .toggleStyle(.goldSwitch)
 
                 if settings.lockOnIdle {
                     HStack {
@@ -49,6 +53,21 @@ struct GeneralSettingsView: View {
             IdleMonitorService.shared.startMonitoring()
         } else {
             IdleMonitorService.shared.stopMonitoring()
+        }
+
+        // Register or unregister launch at login
+        updateLaunchAtLogin(enabled: settings.launchAtLogin)
+    }
+
+    private func updateLaunchAtLogin(enabled: Bool) {
+        do {
+            if enabled {
+                try SMAppService.mainApp.register()
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
+        } catch {
+            NSLog("[MakLock] Failed to update login item: %@", error.localizedDescription)
         }
     }
 }
