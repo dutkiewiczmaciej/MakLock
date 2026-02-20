@@ -42,7 +42,7 @@ MakLock is a lightweight menu bar app that protects your macOS applications with
 - [x] Full-screen blur overlay
 - [x] Auto-lock after idle timeout
 - [x] Auto-lock on sleep/wake
-- [x] Apple Watch proximity unlock
+- [ ] Apple Watch proximity unlock *(coming soon)*
 - [x] Panic key emergency exit
 - [x] System app blacklist (never locks Terminal, Xcode, etc.)
 - [x] Multi-monitor support
