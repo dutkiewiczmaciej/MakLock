@@ -10,7 +10,8 @@ final class OverlayWindowService {
     private var currentApp: ProtectedApp?
 
     /// Callback when overlay is dismissed after successful authentication.
-    var onUnlocked: (() -> Void)?
+    /// Passes the name of the unlocked app.
+    var onUnlocked: ((String) -> Void)?
 
     private init() {
         // Observe screen configuration changes (connect/disconnect monitors)
@@ -82,6 +83,11 @@ final class OverlayWindowService {
         currentApp?.bundleIdentifier
     }
 
+    /// Display name of the currently locked app (if any).
+    var currentAppName: String? {
+        currentApp?.name
+    }
+
     /// During Touch ID: pass through mouse events so system dialog gets interaction.
     /// After auth: restore mouse capture for overlay blocking.
     func setTouchIDMode(_ active: Bool) {
@@ -128,8 +134,9 @@ final class OverlayWindowService {
                     bundleIdentifier: app.bundleIdentifier,
                     isPrimary: false,
                     onDismiss: { [weak self] in
+                        let name = self?.currentApp?.name ?? "app"
                         self?.hide()
-                        self?.onUnlocked?()
+                        self?.onUnlocked?(name)
                     }
                 )
                 window.contentView = NSHostingView(rootView: overlayView)
@@ -153,8 +160,9 @@ final class OverlayWindowService {
                 bundleIdentifier: app.bundleIdentifier,
                 isPrimary: isPrimary,
                 onDismiss: { [weak self] in
+                    let name = self?.currentApp?.name ?? "app"
                     self?.hide()
-                    self?.onUnlocked?()
+                    self?.onUnlocked?(name)
                 }
             )
 
@@ -168,20 +176,14 @@ final class OverlayWindowService {
     // MARK: - App Window Management
 
     /// Bring the protected app to the foreground after successful auth.
+    /// Only activates if the app is already running — never launches a closed app.
     private func activateProtectedApp(bundleIdentifier: String) {
-        guard let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) else {
-            NSLog("[MakLock] Could not find app URL for: %@", bundleIdentifier)
+        guard let app = NSWorkspace.shared.runningApplications.first(where: { $0.bundleIdentifier == bundleIdentifier }) else {
+            NSLog("[MakLock] App not running, skipping activation: %@", bundleIdentifier)
             return
         }
-        let config = NSWorkspace.OpenConfiguration()
-        config.activates = true
-        NSWorkspace.shared.openApplication(at: appURL, configuration: config) { _, error in
-            if let error {
-                NSLog("[MakLock] Failed to activate app: %@", error.localizedDescription)
-            } else {
-                NSLog("[MakLock] Activated app: %@", bundleIdentifier)
-            }
-        }
+        app.activate()
+        NSLog("[MakLock] Activated app: %@", bundleIdentifier)
     }
 
     // MARK: - Timeout

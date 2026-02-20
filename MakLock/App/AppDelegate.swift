@@ -1,4 +1,5 @@
 import AppKit
+import UserNotifications
 
 /// Application delegate responsible for lifecycle and menu bar setup.
 final class AppDelegate: NSObject, NSApplicationDelegate {
@@ -6,6 +7,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         menuBarController.setup()
+
+        // Request notification permission (for Watch unlock notifications)
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
 
         // Show onboarding on first launch
         OnboardingWindowController.shared.showIfNeeded()
@@ -21,10 +25,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Wire up app monitor → overlay
         AppMonitorService.shared.onProtectedAppDetected = { [weak self] app in
-            // Auto-unlock if Watch is in range — no overlay needed
-            if Defaults.shared.appSettings.useWatchUnlock && WatchProximityService.shared.isWatchInRange {
+            // Auto-unlock if Watch is in range AND unlocked (on wrist).
+            // If Watch is nearby but locked/off wrist, fall through to Touch ID.
+            let watch = WatchProximityService.shared
+            let watchCanUnlock = Defaults.shared.appSettings.useWatchUnlock
+                && watch.isWatchInRange
+                && (watch.isWatchUnlocked ?? true)
+            if watchCanUnlock {
                 AppMonitorService.shared.markAuthenticated(app.bundleIdentifier)
                 WatchUnlockToast.shared.show(for: app.bundleIdentifier)
+                Self.sendWatchUnlockNotification(appName: app.name)
                 return
             }
             OverlayWindowService.shared.show(for: app)
@@ -32,18 +42,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Update icon when overlay is dismissed after successful auth
-        OverlayWindowService.shared.onUnlocked = { [weak self] in
+        OverlayWindowService.shared.onUnlocked = { [weak self] appName in
             self?.menuBarController.iconState = .active
+            Self.sendUnlockNotification(appName: appName)
         }
 
-        // Start app monitoring
-        AppMonitorService.shared.startMonitoring()
+        // Start Watch proximity BEFORE app monitoring so Watch has time to connect.
+        // This prevents false overlay triggers on app restart.
+        if Defaults.shared.appSettings.useWatchUnlock {
+            WatchProximityService.shared.startScanning()
+        }
 
-        // Wire up idle monitor → lock all protected apps
+        // Delay app monitoring slightly to give Watch time to connect on startup.
+        // Without this, protected running apps would trigger overlays before
+        // the Watch connection is established.
+        let monitorDelay: TimeInterval = Defaults.shared.appSettings.useWatchUnlock ? 8.0 : 0
+        DispatchQueue.main.asyncAfter(deadline: .now() + monitorDelay) {
+            AppMonitorService.shared.startMonitoring()
+        }
+
+        // Wire up idle monitor → lock all running protected apps
         IdleMonitorService.shared.onIdleTimeoutReached = { [weak self] in
             guard let self else { return }
             AppMonitorService.shared.clearAllAuthentications()
-            let apps = ProtectedAppsManager.shared.apps.filter(\.isEnabled)
+            let runningBundleIDs = Set(NSWorkspace.shared.runningApplications.map(\.bundleIdentifier))
+            let apps = ProtectedAppsManager.shared.apps.filter { $0.isEnabled && runningBundleIDs.contains($0.bundleIdentifier) }
             for app in apps {
                 OverlayWindowService.shared.show(for: app)
             }
@@ -57,11 +80,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             IdleMonitorService.shared.startMonitoring()
         }
 
-        // Wire up sleep/wake → lock all protected apps on sleep
+        // Wire up sleep/wake → lock all running protected apps on sleep
         SleepWakeService.shared.onSleep = { [weak self] in
             guard let self else { return }
             AppMonitorService.shared.clearAllAuthentications()
-            let apps = ProtectedAppsManager.shared.apps.filter(\.isEnabled)
+            let runningBundleIDs = Set(NSWorkspace.shared.runningApplications.map(\.bundleIdentifier))
+            let apps = ProtectedAppsManager.shared.apps.filter { $0.isEnabled && runningBundleIDs.contains($0.bundleIdentifier) }
             for app in apps {
                 OverlayWindowService.shared.show(for: app)
             }
@@ -73,12 +97,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Start sleep/wake observer
         SleepWakeService.shared.startObserving()
 
-        // Wire up Watch proximity → auto-unlock when Watch is in range
+        // Wire up Watch proximity → auto-unlock when Watch returns in range
         WatchProximityService.shared.onWatchInRange = { [weak self] in
             guard OverlayWindowService.shared.isShowing else { return }
+            // Only auto-unlock if Watch is on wrist (unlocked)
+            guard WatchProximityService.shared.isWatchUnlocked ?? true else { return }
             let lockedBundleID = OverlayWindowService.shared.currentBundleIdentifier
+            let lockedAppName = OverlayWindowService.shared.currentAppName
             OverlayWindowService.shared.hide()
             WatchUnlockToast.shared.show(for: lockedBundleID)
+            Self.sendWatchUnlockNotification(appName: lockedAppName ?? "app")
             self?.menuBarController.iconState = .active
         }
 
@@ -86,7 +114,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         WatchProximityService.shared.onWatchOutOfRange = { [weak self] in
             guard let self else { return }
             AppMonitorService.shared.clearAllAuthentications()
-            let apps = ProtectedAppsManager.shared.apps.filter(\.isEnabled)
+            // Only lock apps that are actually running — don't create overlays for closed apps
+            let runningBundleIDs = Set(NSWorkspace.shared.runningApplications.map(\.bundleIdentifier))
+            let apps = ProtectedAppsManager.shared.apps.filter { $0.isEnabled && runningBundleIDs.contains($0.bundleIdentifier) }
             for app in apps {
                 OverlayWindowService.shared.show(for: app)
             }
@@ -95,9 +125,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        // Start Watch proximity if enabled
-        if Defaults.shared.appSettings.useWatchUnlock {
-            WatchProximityService.shared.startScanning()
-        }
+    }
+
+    /// Post a local notification when Watch auto-unlocks an app.
+    static func sendWatchUnlockNotification(appName: String) {
+        sendNotification(title: "Unlocked", body: "Apple Watch unlocked \(appName)")
+    }
+
+    /// Post a local notification when Touch ID or password unlocks an app.
+    static func sendUnlockNotification(appName: String) {
+        sendNotification(title: "Unlocked", body: "\(appName) unlocked with Touch ID")
+    }
+
+    private static func sendNotification(title: String, body: String) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body = body
+        content.sound = nil
+
+        let request = UNNotificationRequest(
+            identifier: "maklock-\(UUID().uuidString)",
+            content: content,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(request)
     }
 }

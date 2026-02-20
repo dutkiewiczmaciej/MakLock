@@ -21,7 +21,12 @@ private func watchLog(_ message: String) {
 
 /// Monitors Apple Watch BLE proximity for auto-unlock.
 ///
-/// When the paired Watch moves out of range (RSSI below threshold),
+/// Uses a hybrid approach:
+/// - **Connection** to the paired Watch for reliable RSSI polling.
+/// - **Background scanning** with `allowDuplicates` to detect Apple Continuity
+///   "Nearby Info" packets, which reveal whether the Watch is on-wrist (unlocked).
+///
+/// When the paired Watch moves out of range or is taken off wrist,
 /// the system triggers a lock. When it returns in range, auto-unlock fires.
 final class WatchProximityService: NSObject, ObservableObject {
     static let shared = WatchProximityService()
@@ -32,8 +37,12 @@ final class WatchProximityService: NSObject, ObservableObject {
     /// Callback when the Watch returns to BLE range.
     var onWatchInRange: (() -> Void)?
 
-    /// Whether the Watch is currently detected in range.
+    /// Whether the Watch is currently detected in range and unlocked (on wrist).
     @Published private(set) var isWatchInRange = false
+
+    /// Whether the Watch is unlocked (on wrist) based on Continuity Nearby Info.
+    /// `nil` means we haven't received lock state data yet (assume unlocked for backward compat).
+    @Published private(set) var isWatchUnlocked: Bool?
 
     /// Whether BLE scanning is active.
     @Published private(set) var isScanning = false
@@ -68,9 +77,14 @@ final class WatchProximityService: NSObject, ObservableObject {
     private var pairedPeripheral: CBPeripheral?
     private var rssiTimer: Timer?
 
-    /// Number of consecutive out-of-range readings before triggering.
+    /// Number of consecutive out-of-range RSSI readings before triggering.
     private let outOfRangeCount = 3
     private var consecutiveOutOfRange = 0
+
+    /// Number of consecutive "locked" Nearby Info readings before changing lock state.
+    /// Prevents flapping from occasional noisy BLE packets.
+    private let lockedReadingsRequired = 5
+    private var consecutiveLockedReadings = 0
 
     private override init() {
         super.init()
@@ -102,7 +116,9 @@ final class WatchProximityService: NSObject, ObservableObject {
         pairedPeripheral = nil
         isScanning = false
         isWatchInRange = false
+        isWatchUnlocked = nil
         consecutiveOutOfRange = 0
+        consecutiveLockedReadings = 0
         watchLog("Watch proximity scanning stopped")
     }
 
@@ -124,6 +140,10 @@ final class WatchProximityService: NSObject, ObservableObject {
     }
 
     private func handleRSSI(_ rssi: Int) {
+        // RSSI-only proximity detection.
+        // Lock state (on-wrist) is checked separately in AppDelegate when deciding
+        // whether to auto-unlock. Taking the Watch off does NOT re-lock already open apps —
+        // it only prevents future auto-unlocks (requiring Touch ID instead).
         if rssi < rssiThreshold {
             consecutiveOutOfRange += 1
             if consecutiveOutOfRange >= outOfRangeCount && isWatchInRange {
@@ -139,6 +159,40 @@ final class WatchProximityService: NSObject, ObservableObject {
                 onWatchInRange?()
             }
         }
+    }
+
+    // MARK: - Nearby Info Parsing
+
+    /// Parse Apple Continuity "Nearby Info" packet from BLE advertisement manufacturer data.
+    /// Returns `true` if device is unlocked, `false` if locked, `nil` if not a Nearby Info packet.
+    private func parseNearbyInfoLockState(from advertisementData: [String: Any]) -> Bool? {
+        guard let mfgData = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data,
+              mfgData.count >= 6 else { return nil }
+
+        // Check Apple Company ID (0x004C little-endian)
+        guard mfgData[0] == 0x4C, mfgData[1] == 0x00 else { return nil }
+
+        // Apple Continuity packets contain multiple TLV (Type-Length-Value) entries after the company ID.
+        // We need to iterate through them to find Nearby Info (type 0x10).
+        let payload = Array(mfgData.dropFirst(2))
+        var offset = 0
+
+        while offset + 1 < payload.count {
+            let type = payload[offset]
+            let length = Int(payload[offset + 1])
+            let dataStart = offset + 2
+
+            if type == 0x10, length >= 3, dataStart + 2 < payload.count {
+                // Nearby Info found
+                let dataFlags = payload[dataStart + 1]
+                let unlocked = (dataFlags & 0x80) != 0
+                return unlocked
+            }
+
+            offset = dataStart + length
+        }
+
+        return nil
     }
 }
 
@@ -179,31 +233,46 @@ extension WatchProximityService: CBCentralManagerDelegate {
                 peripheral.delegate = self
                 central.connect(peripheral)
                 watchLog("Reconnecting to paired Watch: \(watchID.uuidString)")
-                return
+            } else {
+                watchLog("Paired Watch not found via retrievePeripherals, falling through to scan")
             }
-            watchLog("Paired Watch not found via retrievePeripherals, falling through to scan")
         }
 
-        // Scan for nearby devices
+        // Always scan with allowDuplicates — picks up Nearby Info from ALL Apple devices
+        // (the Watch may broadcast Nearby Info from a different BLE address than the connected one)
         central.scanForPeripherals(withServices: nil, options: [
-            CBCentralManagerScanOptionAllowDuplicatesKey: false
+            CBCentralManagerScanOptionAllowDuplicatesKey: true
         ])
-        watchLog("Scanning for BLE peripherals...")
+        watchLog("Scanning for BLE peripherals (allowDuplicates, Nearby Info detection)...")
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral,
                         advertisementData: [String: Any], rssi RSSI: NSNumber) {
-        // Check both peripheral.name and advertisement local name
         let peripheralName = peripheral.name
         let advName = advertisementData[CBAdvertisementDataLocalNameKey] as? String
         let name = peripheralName ?? advName
 
-        // Log all named devices for debugging
-        if let name {
-            watchLog("BLE device: \"\(name)\" RSSI: \(RSSI) ID: \(peripheral.identifier.uuidString)")
+        // --- Nearby Info detection: check lock state from Continuity advertisement ---
+        if peripheral.identifier == pairedWatchIdentifier,
+           let lockState = parseNearbyInfoLockState(from: advertisementData) {
+            if lockState {
+                // Unlocked → accept immediately (user put Watch back on)
+                consecutiveLockedReadings = 0
+                if isWatchUnlocked != true {
+                    watchLog("Watch lock state changed: unlocked=true")
+                    isWatchUnlocked = true
+                }
+            } else {
+                // Locked → require multiple consecutive readings to avoid flapping
+                consecutiveLockedReadings += 1
+                if consecutiveLockedReadings >= lockedReadingsRequired && isWatchUnlocked != false {
+                    watchLog("Watch lock state changed: unlocked=false (after \(consecutiveLockedReadings) readings)")
+                    isWatchUnlocked = false
+                }
+            }
         }
 
-        // Look for Apple Watch by name (handles "Apple Watch", "Maciej's Apple Watch", etc.)
+        // --- Watch pairing and connection ---
         guard let name, name.localizedCaseInsensitiveContains("watch") else { return }
 
         // If no Watch is paired, pair with the first one found
@@ -214,7 +283,9 @@ extension WatchProximityService: CBCentralManagerDelegate {
 
         guard peripheral.identifier == pairedWatchIdentifier else { return }
 
-        central.stopScan()
+        // Only connect if not already connected
+        guard pairedPeripheral == nil else { return }
+
         pairedPeripheral = peripheral
         peripheral.delegate = self
         central.connect(peripheral)
@@ -223,22 +294,20 @@ extension WatchProximityService: CBCentralManagerDelegate {
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         watchLog("Connected to Watch: \(peripheral.identifier.uuidString) (name: \(peripheral.name ?? "nil"))")
-        isWatchInRange = true
-        consecutiveOutOfRange = 0
+        // Don't set isWatchInRange here — let handleRSSI determine it
+        // based on both RSSI threshold AND lock state from Nearby Info.
         startRSSIPolling()
     }
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         watchLog("Failed to connect: \(peripheral.identifier.uuidString) error: \(error?.localizedDescription ?? "nil")")
-        // Retry scan
-        central.scanForPeripherals(withServices: nil, options: [
-            CBCentralManagerScanOptionAllowDuplicatesKey: false
-        ])
     }
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         watchLog("Watch disconnected (error: \(error?.localizedDescription ?? "none"))")
         isWatchInRange = false
+        isWatchUnlocked = nil
+        pairedPeripheral = nil
         rssiTimer?.invalidate()
         rssiTimer = nil
         onWatchOutOfRange?()
@@ -256,7 +325,6 @@ extension WatchProximityService: CBPeripheralDelegate {
             watchLog("RSSI read error: \(error!.localizedDescription)")
             return
         }
-        watchLog("RSSI: \(RSSI.intValue)")
         handleRSSI(RSSI.intValue)
     }
 }

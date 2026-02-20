@@ -16,7 +16,6 @@ Package.resolved
 
 # Local development config
 CLAUDE.md
-CURRENT_TASK.md
 .claude/
 .mcp.json
 
