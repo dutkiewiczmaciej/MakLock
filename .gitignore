@@ -20,6 +20,11 @@ CURRENT_TASK.md
 .claude/
 .mcp.json
 
+# Temp design files
+icon-proposals.html
+icon-render.html
+.playwright-mcp/
+
 # Archives and distribution
 *.dmg
 *.zip
