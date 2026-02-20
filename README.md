@@ -71,15 +71,15 @@ MakLock is a lightweight menu bar app that protects your macOS applications with
 
 ### Download
 
-Download the latest `.dmg` from [**Releases**](https://github.com/dutkiewiczmaciej/maklock/releases/latest).
+Download the latest `.dmg` from [**Releases**](https://github.com/dutkiewiczmaciej/MakLock/releases/latest).
 
 > MakLock is notarized by Apple for safe distribution outside the App Store.
 
 ### Build from Source
 
 ```bash
-git clone https://github.com/dutkiewiczmaciej/maklock.git
-cd maklock
+git clone https://github.com/dutkiewiczmaciej/MakLock.git
+cd MakLock
 open MakLock.xcodeproj
 ```
 
