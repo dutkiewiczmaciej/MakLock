@@ -1,18 +1,18 @@
 import AppKit
 
-/// Full-screen overlay window that blocks interaction with a protected app.
-final class LockOverlayWindow: NSWindow {
+/// Full-screen overlay panel that blocks interaction with a protected app.
+/// Uses NSPanel with .nonactivatingPanel so MakLock does NOT become the active app
+/// when the overlay is shown — this lets the system Touch ID dialog keep focus.
+final class LockOverlayWindow: NSPanel {
     init(for screen: NSScreen) {
         super.init(
             contentRect: screen.frame,
-            styleMask: .borderless,
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
 
-        // Use statusBar level — high enough to be above normal windows and Dock,
-        // but below system security dialogs (Touch ID) which need focus priority
-        self.level = .statusBar
+        self.level = .screenSaver
         self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         self.isOpaque = false
         self.backgroundColor = .clear
@@ -20,6 +20,8 @@ final class LockOverlayWindow: NSWindow {
         self.hasShadow = false
         self.isReleasedWhenClosed = false
         self.animationBehavior = .none
+        self.hidesOnDeactivate = false
+        self.becomesKeyOnlyIfNeeded = true
     }
 
     /// Reposition the overlay to match the given screen frame.

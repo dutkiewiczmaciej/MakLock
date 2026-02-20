@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import CoreServices
 
 /// Modal view for selecting applications to protect.
 struct AppPickerView: View {
@@ -83,10 +84,11 @@ struct AppPickerView: View {
         if searchText.isEmpty {
             return installedApps
         }
+        let query = searchText
         return installedApps.filter { app in
-            app.name.localizedCaseInsensitiveContains(searchText) ||
-            app.bundleIdentifier.localizedCaseInsensitiveContains(searchText) ||
-            app.searchableNames.contains { $0.localizedCaseInsensitiveContains(searchText) }
+            app.name.localizedCaseInsensitiveContains(query) ||
+            app.bundleIdentifier.localizedCaseInsensitiveContains(query) ||
+            app.searchableNames.contains(where: { $0.localizedCaseInsensitiveContains(query) })
         }
     }
 
@@ -114,9 +116,19 @@ struct AppPickerView: View {
                       !SafetyManager.isBlacklisted(bundleID),
                       !alreadyProtected.contains(bundleID) else { continue }
 
-                // Use localized display name (works with any system language)
-                let name = FileManager.default.displayName(atPath: path)
+                // Use localized display name from Spotlight metadata (most reliable)
+                let fileURL = URL(fileURLWithPath: path)
+                var spotlightName: String?
+                if let mdItem = MDItemCreateWithURL(nil, fileURL as CFURL),
+                   let mdName = MDItemCopyAttribute(mdItem, kMDItemDisplayName) as? String {
+                    spotlightName = mdName.replacingOccurrences(of: ".app", with: "")
+                }
+
+                // Fallback to FileManager displayName
+                let displayName = FileManager.default.displayName(atPath: path)
                     .replacingOccurrences(of: ".app", with: "")
+
+                let name = spotlightName ?? displayName
 
                 // Collect alternative names for search
                 var searchNames: Set<String> = []
@@ -124,6 +136,8 @@ struct AppPickerView: View {
                 // Filename (always English on macOS, e.g. "Chess")
                 let fileName = (item as NSString).deletingPathExtension
                 searchNames.insert(fileName)
+                searchNames.insert(displayName)
+                if let sn = spotlightName { searchNames.insert(sn) }
 
                 // CFBundleName / CFBundleDisplayName from Info.plist
                 if let bundleName = bundle.infoDictionary?["CFBundleName"] as? String {
@@ -133,19 +147,14 @@ struct AppPickerView: View {
                     searchNames.insert(displayName)
                 }
 
-                // Localized names from all available .lproj/InfoPlist.strings
-                for localization in bundle.localizations {
-                    if let url = bundle.url(forResource: "InfoPlist", withExtension: "strings", subdirectory: nil, localization: localization),
-                       let dict = NSDictionary(contentsOf: url) as? [String: String] {
-                        if let n = dict["CFBundleDisplayName"] { searchNames.insert(n) }
-                        if let n = dict["CFBundleName"] { searchNames.insert(n) }
-                    }
-                    // Also check localized Info.plist directly
-                    if let localDict = bundle.localizedInfoDictionary {
-                        if let n = localDict["CFBundleDisplayName"] as? String { searchNames.insert(n) }
-                        if let n = localDict["CFBundleName"] as? String { searchNames.insert(n) }
-                    }
+                // Localized names from the bundle
+                if let localDict = bundle.localizedInfoDictionary {
+                    if let n = localDict["CFBundleDisplayName"] as? String { searchNames.insert(n) }
+                    if let n = localDict["CFBundleName"] as? String { searchNames.insert(n) }
                 }
+
+                NSLog("[MakLock] App: %@ | display=%@ | spotlight=%@ | searchNames=%@",
+                      bundleID, displayName, spotlightName ?? "nil", searchNames.description)
 
                 apps.append(AppInfo(
                     bundleIdentifier: bundleID,

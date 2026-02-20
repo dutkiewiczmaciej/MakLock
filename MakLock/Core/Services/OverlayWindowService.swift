@@ -29,13 +29,13 @@ final class OverlayWindowService {
 
         currentApp = app
 
-        // Hide the protected app's windows so content isn't visible behind the overlay
-        hideProtectedApp(bundleIdentifier: app.bundleIdentifier)
+        // Don't hide the protected app — the overlay blur covers its content,
+        // and hiding it causes macOS to reassign app focus, which interferes
+        // with the system Touch ID dialog.
 
         createOverlayWindows(for: app)
         startTimeoutTimer()
 
-        // Don't activate or make key — the system Touch ID dialog needs focus
         NSLog("[MakLock] Overlay shown for: %@", app.name)
     }
 
@@ -49,13 +49,16 @@ final class OverlayWindowService {
         // Mark the app as authenticated so it won't re-lock immediately
         if let app = currentApp {
             AppMonitorService.shared.markAuthenticated(app.bundleIdentifier)
-
-            // Bring the protected app back to the foreground
-            activateProtectedApp(bundleIdentifier: app.bundleIdentifier)
         }
 
         overlayWindows.forEach { $0.close() }
         overlayWindows.removeAll()
+
+        // Activate the protected app now that overlays are gone
+        if let app = currentApp {
+            activateProtectedApp(bundleIdentifier: app.bundleIdentifier)
+        }
+
         currentApp = nil
         NSLog("[MakLock] Overlay dismissed")
     }
@@ -70,18 +73,11 @@ final class OverlayWindowService {
         !overlayWindows.isEmpty
     }
 
-    /// During Touch ID: lower window level and pass through mouse events
-    /// so the system dialog gets full focus and Touch ID sensor works.
-    /// After auth: restore high level and mouse capture.
+    /// During Touch ID: pass through mouse events so system dialog gets interaction.
+    /// After auth: restore mouse capture for overlay blocking.
     func setTouchIDMode(_ active: Bool) {
         for window in overlayWindows {
-            if active {
-                window.level = .floating
-                window.ignoresMouseEvents = true
-            } else {
-                window.level = .statusBar
-                window.ignoresMouseEvents = false
-            }
+            window.ignoresMouseEvents = active
         }
     }
 
@@ -162,25 +158,12 @@ final class OverlayWindowService {
 
     // MARK: - App Window Management
 
-    /// Hide the protected app's windows so content isn't visible behind the overlay.
-    private func hideProtectedApp(bundleIdentifier: String) {
-        let runningApps = NSWorkspace.shared.runningApplications
-        if let app = runningApps.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
-            app.hide()
-            NSLog("[MakLock] Hidden app windows: %@", bundleIdentifier)
-        }
-    }
-
-    /// Bring the protected app back to the foreground after successful auth.
+    /// Bring the protected app to the foreground after successful auth.
     private func activateProtectedApp(bundleIdentifier: String) {
         let runningApps = NSWorkspace.shared.runningApplications
         if let app = runningApps.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
-            // Delay to let overlay windows fully close before activating
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                app.unhide()
-                app.activate(options: .activateIgnoringOtherApps)
-                NSLog("[MakLock] Activated app: %@", bundleIdentifier)
-            }
+            app.activate(options: .activateIgnoringOtherApps)
+            NSLog("[MakLock] Activated app: %@", bundleIdentifier)
         }
     }
 
