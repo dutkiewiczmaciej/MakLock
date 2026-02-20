@@ -37,8 +37,18 @@ final class KeychainManager {
     }
 
     /// Check whether a backup password exists in the Keychain.
+    /// Uses attribute-only query to avoid triggering the Keychain authorization dialog.
     func hasPassword() -> Bool {
-        return retrievePassword() != nil
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnAttributes as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        return status == errSecSuccess
     }
 
     /// Remove the stored password from the Keychain.

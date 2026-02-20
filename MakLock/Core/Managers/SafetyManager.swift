@@ -28,7 +28,7 @@ final class SafetyManager {
     static let overlayTimeout: TimeInterval = 60
 
     /// Dev mode auto-dismiss time (seconds).
-    static let devModeTimeout: TimeInterval = 10
+    static let devModeTimeout: TimeInterval = 25
 
     /// Bundle identifiers that can never be locked.
     static let systemBlacklist: Set<String> = [

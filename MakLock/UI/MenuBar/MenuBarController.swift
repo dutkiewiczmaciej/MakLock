@@ -35,7 +35,8 @@ final class MenuBarController {
             },
             onSettingsClicked: { [weak self] in
                 self?.hidePopover()
-                NotificationCenter.default.post(name: .openSettings, object: nil)
+                let screen = self?.statusItem?.button?.window?.screen
+                NotificationCenter.default.post(name: .openSettings, object: screen)
             },
             onQuitClicked: {
                 NSApplication.shared.terminate(nil)

@@ -16,8 +16,11 @@ final class SettingsWindowController {
         )
     }
 
-    @objc func openSettings() {
+    @objc func openSettings(_ notification: Notification) {
+        let targetScreen = notification.object as? NSScreen ?? NSScreen.main ?? NSScreen.screens[0]
+
         if let window {
+            centerWindow(window, on: targetScreen)
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
@@ -34,11 +37,21 @@ final class SettingsWindowController {
         )
         window.title = "MakLock Settings"
         window.contentViewController = hostingController
-        window.center()
         window.isReleasedWhenClosed = false
+        centerWindow(window, on: targetScreen)
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
 
         self.window = window
+    }
+
+    private func centerWindow(_ window: NSWindow, on screen: NSScreen) {
+        let screenFrame = screen.visibleFrame
+        let windowSize = window.frame.size
+        let origin = NSPoint(
+            x: screenFrame.midX - windowSize.width / 2,
+            y: screenFrame.midY - windowSize.height / 2
+        )
+        window.setFrameOrigin(origin)
     }
 }
