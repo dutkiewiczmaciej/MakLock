@@ -4,7 +4,10 @@ import SwiftUI
 struct WatchSettingsView: View {
     @ObservedObject private var watchService = WatchProximityService.shared
     @State private var settings = Defaults.shared.appSettings
-    @State private var sensitivity: Double = 50
+    @State private var sensitivity: Double = {
+        let rssi = Double(Defaults.shared.appSettings.watchRssiThreshold)
+        return ((rssi + 90) / 40.0) * 100
+    }()
 
     var body: some View {
         Form {
@@ -52,10 +55,16 @@ struct WatchSettingsView: View {
                         }
                         .padding(.vertical, 4)
 
+                        // UUID copyable via context menu (NOT .textSelection — causes layout loop in TabView)
                         Text(watchID.uuidString)
                             .font(.system(size: 10, design: .monospaced))
                             .foregroundColor(.secondary)
-                            .textSelection(.enabled)
+                            .contextMenu {
+                                Button("Copy") {
+                                    NSPasteboard.general.clearContents()
+                                    NSPasteboard.general.setString(watchID.uuidString, forType: .string)
+                                }
+                            }
                     } else {
                         HStack {
                             ProgressView()
@@ -80,6 +89,9 @@ struct WatchSettingsView: View {
                                 .onChange(of: sensitivity) { value in
                                     let rssi = Int(-90 + (value / 100.0) * 40)
                                     watchService.rssiThreshold = rssi
+                                    var s = Defaults.shared.appSettings
+                                    s.watchRssiThreshold = rssi
+                                    Defaults.shared.appSettings = s
                                 }
                             Text(sensitivityLabel)
                                 .frame(width: 50, alignment: .trailing)
@@ -101,11 +113,6 @@ struct WatchSettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .padding()
-        .onAppear {
-            let rssi = Double(watchService.rssiThreshold)
-            sensitivity = ((rssi + 90) / 40.0) * 100
-        }
     }
 
     // MARK: - Bluetooth Status
@@ -133,7 +140,6 @@ struct WatchSettingsView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            openSettingsButton(label: "Open Bluetooth Settings")
 
         case .unauthorized:
             HStack(spacing: 8) {
@@ -147,7 +153,6 @@ struct WatchSettingsView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            openSettingsButton(label: "Open Privacy Settings")
 
         case .unsupported:
             HStack(spacing: 8) {
@@ -166,15 +171,6 @@ struct WatchSettingsView: View {
                     .foregroundColor(.secondary)
             }
         }
-    }
-
-    private func openSettingsButton(label: String) -> some View {
-        Button(label) {
-            if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Bluetooth") {
-                NSWorkspace.shared.open(url)
-            }
-        }
-        .font(MakLockTypography.caption)
     }
 
     private var sensitivityLabel: String {

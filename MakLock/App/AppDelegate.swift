@@ -21,6 +21,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Wire up app monitor → overlay
         AppMonitorService.shared.onProtectedAppDetected = { [weak self] app in
+            // Auto-unlock if Watch is in range — no overlay needed
+            if Defaults.shared.appSettings.useWatchUnlock && WatchProximityService.shared.isWatchInRange {
+                AppMonitorService.shared.markAuthenticated(app.bundleIdentifier)
+                WatchUnlockToast.shared.show(for: app.bundleIdentifier)
+                return
+            }
             OverlayWindowService.shared.show(for: app)
             self?.menuBarController.iconState = .locked
         }
@@ -70,14 +76,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Wire up Watch proximity → auto-unlock when Watch is in range
         WatchProximityService.shared.onWatchInRange = { [weak self] in
             guard OverlayWindowService.shared.isShowing else { return }
+            let lockedBundleID = OverlayWindowService.shared.currentBundleIdentifier
             OverlayWindowService.shared.hide()
+            WatchUnlockToast.shared.show(for: lockedBundleID)
             self?.menuBarController.iconState = .active
-            NSLog("[MakLock] Auto-unlocked via Watch proximity")
         }
 
         // Wire up Watch proximity → lock when Watch leaves range
         WatchProximityService.shared.onWatchOutOfRange = { [weak self] in
             guard let self else { return }
+            AppMonitorService.shared.clearAllAuthentications()
             let apps = ProtectedAppsManager.shared.apps.filter(\.isEnabled)
             for app in apps {
                 OverlayWindowService.shared.show(for: app)

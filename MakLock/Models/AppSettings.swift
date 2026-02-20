@@ -23,6 +23,10 @@ struct AppSettings: Codable {
     /// Use Apple Watch proximity for auto-unlock.
     var useWatchUnlock: Bool = false
 
+    /// Watch RSSI threshold for proximity detection.
+    /// Default: -70 dBm (~2-3 meters). Higher (less negative) = stricter.
+    var watchRssiThreshold: Int = -70
+
     /// Launch MakLock at login.
     var launchAtLogin: Bool = false
 }

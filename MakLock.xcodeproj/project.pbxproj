@@ -41,6 +41,7 @@
 		A10000000000000000000801 /* LockOverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000811 /* LockOverlayWindow.swift */; };
 		A10000000000000000000802 /* LockOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000812 /* LockOverlayView.swift */; };
 		A10000000000000000000803 /* OverlayWindowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000813 /* OverlayWindowService.swift */; };
+		A10000000000000000000804 /* WatchUnlockToast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000814 /* WatchUnlockToast.swift */; };
 		A10000000000000000000901 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000911 /* AuthenticationService.swift */; };
 		A10000000000000000000902 /* PasswordInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000912 /* PasswordInputView.swift */; };
 		A10000000000000000000A01 /* IdleMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000A11 /* IdleMonitorService.swift */; };
@@ -88,6 +89,7 @@
 		A10000000000000000000811 /* LockOverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockOverlayWindow.swift; sourceTree = "<group>"; };
 		A10000000000000000000812 /* LockOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockOverlayView.swift; sourceTree = "<group>"; };
 		A10000000000000000000813 /* OverlayWindowService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindowService.swift; sourceTree = "<group>"; };
+		A10000000000000000000814 /* WatchUnlockToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchUnlockToast.swift; sourceTree = "<group>"; };
 		A10000000000000000000911 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		A10000000000000000000912 /* PasswordInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordInputView.swift; sourceTree = "<group>"; };
 		A10000000000000000000A11 /* IdleMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleMonitorService.swift; sourceTree = "<group>"; };
@@ -245,6 +247,7 @@
 				A10000000000000000000811 /* LockOverlayWindow.swift */,
 				A10000000000000000000812 /* LockOverlayView.swift */,
 				A10000000000000000000912 /* PasswordInputView.swift */,
+				A10000000000000000000814 /* WatchUnlockToast.swift */,
 			);
 			path = LockOverlay;
 			sourceTree = "<group>";
@@ -405,6 +408,7 @@
 				A10000000000000000000803 /* OverlayWindowService.swift in Sources */,
 				A10000000000000000000901 /* AuthenticationService.swift in Sources */,
 				A10000000000000000000902 /* PasswordInputView.swift in Sources */,
+				A10000000000000000000804 /* WatchUnlockToast.swift in Sources */,
 				A10000000000000000000A01 /* IdleMonitorService.swift in Sources */,
 				A10000000000000000000B01 /* SleepWakeService.swift in Sources */,
 				A10000000000000000000C01 /* WatchProximityService.swift in Sources */,

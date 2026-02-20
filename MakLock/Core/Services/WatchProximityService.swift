@@ -1,5 +1,23 @@
-import Foundation
+import AppKit
 import CoreBluetooth
+import os.log
+
+private let logger = Logger(subsystem: "com.makmak.MakLock", category: "Watch")
+
+private func watchLog(_ message: String) {
+    logger.info("\(message, privacy: .public)")
+    #if DEBUG
+    let line = "[\(Date())] \(message)\n"
+    let path = "/tmp/maklock-watch.log"
+    if let handle = FileHandle(forWritingAtPath: path) {
+        handle.seekToEndOfFile()
+        handle.write(line.data(using: .utf8)!)
+        handle.closeFile()
+    } else {
+        FileManager.default.createFile(atPath: path, contents: line.data(using: .utf8))
+    }
+    #endif
+}
 
 /// Monitors Apple Watch BLE proximity for auto-unlock.
 ///
@@ -62,6 +80,9 @@ final class WatchProximityService: NSObject, ObservableObject {
            let uuid = UUID(uuidString: stored) {
             pairedWatchIdentifier = uuid
         }
+
+        // Restore RSSI threshold from settings
+        rssiThreshold = Defaults.shared.appSettings.watchRssiThreshold
     }
 
     /// Start BLE scanning for the paired Watch.
@@ -69,7 +90,7 @@ final class WatchProximityService: NSObject, ObservableObject {
         guard !isScanning else { return }
         centralManager = CBCentralManager(delegate: self, queue: nil)
         isScanning = true
-        NSLog("[MakLock] Watch proximity scanning started")
+        watchLog("Watch proximity scanning started")
     }
 
     /// Stop BLE scanning.
@@ -82,7 +103,7 @@ final class WatchProximityService: NSObject, ObservableObject {
         isScanning = false
         isWatchInRange = false
         consecutiveOutOfRange = 0
-        NSLog("[MakLock] Watch proximity scanning stopped")
+        watchLog("Watch proximity scanning stopped")
     }
 
     /// Unpair the current Watch.
@@ -90,7 +111,7 @@ final class WatchProximityService: NSObject, ObservableObject {
         stopScanning()
         pairedWatchIdentifier = nil
         pairedPeripheral = nil
-        NSLog("[MakLock] Watch unpaired")
+        watchLog("Watch unpaired")
     }
 
     // MARK: - Private
@@ -107,15 +128,14 @@ final class WatchProximityService: NSObject, ObservableObject {
             consecutiveOutOfRange += 1
             if consecutiveOutOfRange >= outOfRangeCount && isWatchInRange {
                 isWatchInRange = false
-                NSLog("[MakLock] Watch out of range (RSSI: %d, threshold: %d)", rssi, rssiThreshold)
+                watchLog("Watch OUT OF RANGE (RSSI: \(rssi), threshold: \(rssiThreshold))")
                 onWatchOutOfRange?()
             }
         } else {
-            let wasOutOfRange = !isWatchInRange
             consecutiveOutOfRange = 0
-            isWatchInRange = true
-            if wasOutOfRange {
-                NSLog("[MakLock] Watch in range (RSSI: %d)", rssi)
+            if !isWatchInRange {
+                isWatchInRange = true
+                watchLog("Watch IN RANGE (RSSI: \(rssi))")
                 onWatchInRange?()
             }
         }
@@ -126,6 +146,7 @@ final class WatchProximityService: NSObject, ObservableObject {
 
 extension WatchProximityService: CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        let oldState = bluetoothState
         switch central.state {
         case .poweredOn: bluetoothState = .poweredOn
         case .poweredOff: bluetoothState = .poweredOff
@@ -134,9 +155,18 @@ extension WatchProximityService: CBCentralManagerDelegate {
         default: bluetoothState = .unknown
         }
 
+        watchLog("Bluetooth state: \(oldState) → \(bluetoothState)")
+
+        // Reactivate app after Bluetooth permission dialog (menu bar app has no Dock icon)
+        if oldState != .poweredOn && bluetoothState == .poweredOn {
+            DispatchQueue.main.async {
+                NSApp.activate(ignoringOtherApps: true)
+            }
+        }
+
         guard central.state == .poweredOn else {
             if central.state == .unauthorized {
-                NSLog("[MakLock] Bluetooth access not authorized — open System Settings → Privacy & Security → Bluetooth")
+                watchLog("Bluetooth access not authorized")
             }
             return
         }
@@ -148,27 +178,38 @@ extension WatchProximityService: CBCentralManagerDelegate {
                 pairedPeripheral = peripheral
                 peripheral.delegate = self
                 central.connect(peripheral)
-                NSLog("[MakLock] Reconnecting to paired Watch: %@", watchID.uuidString)
+                watchLog("Reconnecting to paired Watch: \(watchID.uuidString)")
                 return
             }
+            watchLog("Paired Watch not found via retrievePeripherals, falling through to scan")
         }
 
-        // Otherwise scan for nearby devices
+        // Scan for nearby devices
         central.scanForPeripherals(withServices: nil, options: [
-            CBCentralManagerScanOptionAllowDuplicatesKey: true
+            CBCentralManagerScanOptionAllowDuplicatesKey: false
         ])
-        NSLog("[MakLock] Scanning for Watch peripherals")
+        watchLog("Scanning for BLE peripherals...")
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral,
                         advertisementData: [String: Any], rssi RSSI: NSNumber) {
-        // Look for Apple Watch by name prefix
-        guard let name = peripheral.name, name.contains("Apple Watch") else { return }
+        // Check both peripheral.name and advertisement local name
+        let peripheralName = peripheral.name
+        let advName = advertisementData[CBAdvertisementDataLocalNameKey] as? String
+        let name = peripheralName ?? advName
+
+        // Log all named devices for debugging
+        if let name {
+            watchLog("BLE device: \"\(name)\" RSSI: \(RSSI) ID: \(peripheral.identifier.uuidString)")
+        }
+
+        // Look for Apple Watch by name (handles "Apple Watch", "Maciej's Apple Watch", etc.)
+        guard let name, name.localizedCaseInsensitiveContains("watch") else { return }
 
         // If no Watch is paired, pair with the first one found
         if pairedWatchIdentifier == nil {
             pairedWatchIdentifier = peripheral.identifier
-            NSLog("[MakLock] Discovered Watch: %@ (ID: %@)", name, peripheral.identifier.uuidString)
+            watchLog("Auto-paired with Watch: \(name) (ID: \(peripheral.identifier.uuidString))")
         }
 
         guard peripheral.identifier == pairedWatchIdentifier else { return }
@@ -177,17 +218,26 @@ extension WatchProximityService: CBCentralManagerDelegate {
         pairedPeripheral = peripheral
         peripheral.delegate = self
         central.connect(peripheral)
+        watchLog("Connecting to Watch: \(name)")
     }
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        NSLog("[MakLock] Connected to Watch: %@", peripheral.identifier.uuidString)
+        watchLog("Connected to Watch: \(peripheral.identifier.uuidString) (name: \(peripheral.name ?? "nil"))")
         isWatchInRange = true
         consecutiveOutOfRange = 0
         startRSSIPolling()
     }
 
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        watchLog("Failed to connect: \(peripheral.identifier.uuidString) error: \(error?.localizedDescription ?? "nil")")
+        // Retry scan
+        central.scanForPeripherals(withServices: nil, options: [
+            CBCentralManagerScanOptionAllowDuplicatesKey: false
+        ])
+    }
+
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        NSLog("[MakLock] Watch disconnected")
+        watchLog("Watch disconnected (error: \(error?.localizedDescription ?? "none"))")
         isWatchInRange = false
         rssiTimer?.invalidate()
         rssiTimer = nil
@@ -202,7 +252,11 @@ extension WatchProximityService: CBCentralManagerDelegate {
 
 extension WatchProximityService: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
-        guard error == nil else { return }
+        guard error == nil else {
+            watchLog("RSSI read error: \(error!.localizedDescription)")
+            return
+        }
+        watchLog("RSSI: \(RSSI.intValue)")
         handleRSSI(RSSI.intValue)
     }
 }

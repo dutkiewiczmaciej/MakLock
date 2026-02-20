@@ -54,9 +54,13 @@ final class OverlayWindowService {
         overlayWindows.forEach { $0.close() }
         overlayWindows.removeAll()
 
-        // Activate the protected app now that overlays are gone
-        if let app = currentApp {
-            activateProtectedApp(bundleIdentifier: app.bundleIdentifier)
+        // Activate the protected app now that overlays are gone.
+        // Small delay ensures overlay panels and Touch ID dialog are fully dismissed
+        // before attempting to bring the app forward.
+        if let bundleID = currentApp?.bundleIdentifier {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) { [weak self] in
+                self?.activateProtectedApp(bundleIdentifier: bundleID)
+            }
         }
 
         currentApp = nil
@@ -71,6 +75,11 @@ final class OverlayWindowService {
     /// Whether an overlay is currently displayed.
     var isShowing: Bool {
         !overlayWindows.isEmpty
+    }
+
+    /// Bundle identifier of the currently locked app (if any).
+    var currentBundleIdentifier: String? {
+        currentApp?.bundleIdentifier
     }
 
     /// During Touch ID: pass through mouse events so system dialog gets interaction.
@@ -160,10 +169,18 @@ final class OverlayWindowService {
 
     /// Bring the protected app to the foreground after successful auth.
     private func activateProtectedApp(bundleIdentifier: String) {
-        let runningApps = NSWorkspace.shared.runningApplications
-        if let app = runningApps.first(where: { $0.bundleIdentifier == bundleIdentifier }) {
-            app.activate(options: .activateIgnoringOtherApps)
-            NSLog("[MakLock] Activated app: %@", bundleIdentifier)
+        guard let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleIdentifier) else {
+            NSLog("[MakLock] Could not find app URL for: %@", bundleIdentifier)
+            return
+        }
+        let config = NSWorkspace.OpenConfiguration()
+        config.activates = true
+        NSWorkspace.shared.openApplication(at: appURL, configuration: config) { _, error in
+            if let error {
+                NSLog("[MakLock] Failed to activate app: %@", error.localizedDescription)
+            } else {
+                NSLog("[MakLock] Activated app: %@", bundleIdentifier)
+            }
         }
     }
 
