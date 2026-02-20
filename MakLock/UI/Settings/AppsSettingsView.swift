@@ -21,7 +21,7 @@ struct AppsSettingsView: View {
             HStack {
                 Spacer()
                 PrimaryButton("Add App", icon: "plus") {
-                    appPickerController.show()
+                    appPickerController.show(from: NSApp.keyWindow)
                 }
             }
         }

@@ -37,14 +37,21 @@ final class AppPickerWindowController {
         )
         window.title = "Add Applications"
         window.contentViewController = hostingController
-        window.center()
         window.isReleasedWhenClosed = false
+
+        // Position on the same screen as the parent window
+        if let parentWindow {
+            let parentFrame = parentWindow.frame
+            let pickerSize = window.frame.size
+            let x = parentFrame.midX - pickerSize.width / 2
+            let y = parentFrame.midY - pickerSize.height / 2
+            window.setFrameOrigin(NSPoint(x: x, y: y))
+        } else {
+            window.center()
+        }
+
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
-
-        if let parentWindow {
-            parentWindow.beginSheet(window)
-        }
 
         self.window = window
     }
