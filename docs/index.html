@@ -6,44 +6,57 @@
     <title>MakLock — Lock any macOS app with Touch ID</title>
     <meta name="description" content="Free, open-source macOS app that locks applications with Touch ID, Apple Watch, and password. The only open-source app locker for macOS.">
     <meta property="og:title" content="MakLock — Lock any macOS app with Touch ID">
-    <meta property="og:description" content="Free, open-source macOS app that locks applications with Touch ID, Apple Watch, and password.">
+    <meta property="og:description" content="Free, open-source macOS app locker. Touch ID, Apple Watch, auto-close. Better than paid alternatives.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://dutkiewiczmaciej.github.io/maklock">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MakLock — Lock any macOS app with Touch ID">
+    <meta name="twitter:description" content="Free, open-source macOS app locker. Touch ID, Apple Watch, auto-close. Better than paid alternatives.">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #FFD213;
-            --gold-dim: #FFD21333;
+            --gold-glow: rgba(255, 210, 19, 0.15);
+            --gold-glow-strong: rgba(255, 210, 19, 0.25);
             --black: #000000;
-            --dark: #0A0A0A;
+            --surface: #0C0C0C;
             --card: #111111;
-            --card-border: #1A1A1A;
-            --text: #FFFFFF;
-            --text-secondary: #888888;
-            --blue: #B5E0F7;
-            --green: #34C759;
-            --red: #FF3B30;
+            --card-hover: #161616;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --text: #F5F5F7;
+            --text-dim: #86868B;
+            --green: #30D158;
+            --red: #FF453A;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Outfit', -apple-system, sans-serif;
             background: var(--black);
             color: var(--text);
             line-height: 1.6;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
+
+        /* Grain overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
         /* ===== NAV ===== */
         nav {
@@ -51,15 +64,15 @@
             top: 0;
             width: 100%;
             z-index: 100;
-            padding: 16px 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--card-border);
+            padding: 14px 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--border);
         }
 
         .nav-inner {
-            max-width: 1200px;
+            max-width: 1120px;
             margin: 0 auto;
             padding: 0 24px;
             display: flex;
@@ -72,321 +85,535 @@
             align-items: center;
             gap: 10px;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 17px;
+            letter-spacing: -0.01em;
             text-decoration: none;
             color: var(--text);
+            transition: opacity 0.2s;
         }
 
-        .nav-logo img {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-        }
+        .nav-logo:hover { opacity: 0.8; }
+
+        .nav-logo img { flex-shrink: 0; }
 
         .nav-links {
             display: flex;
-            gap: 32px;
+            gap: 28px;
             list-style: none;
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--text-dim);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
             transition: color 0.2s;
         }
 
-        .nav-links a:hover {
-            color: var(--text);
-        }
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a.active { color: var(--text); font-weight: 600; }
 
         .nav-cta {
-            background: var(--gold);
+            background: var(--text);
             color: var(--black);
-            padding: 8px 20px;
-            border-radius: 8px;
+            padding: 7px 18px;
+            border-radius: 980px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             transition: opacity 0.2s;
         }
 
-        .nav-cta:hover {
-            opacity: 0.9;
-        }
+        .nav-cta:hover { opacity: 0.85; }
 
         /* ===== HERO ===== */
         .hero {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 120px 24px 80px;
+            padding: 160px 24px 60px;
             position: relative;
         }
 
-        .hero::before {
-            content: '';
+        .hero-glow {
             position: absolute;
-            top: 0;
+            top: -120px;
             left: 50%;
             transform: translateX(-50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--gold-dim) 0%, transparent 70%);
+            width: 800px;
+            height: 500px;
+            background: radial-gradient(ellipse at center, rgba(255, 210, 19, 0.22) 0%, transparent 70%);
             pointer-events: none;
+            opacity: 0;
+            animation: glowIn 1.5s ease 0.3s forwards;
         }
 
-        .hero-badge {
+        @keyframes glowIn { to { opacity: 1; } }
+
+        .hero-pill {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            border-radius: 20px;
-            border: 1px solid var(--card-border);
-            background: var(--card);
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
+            gap: 10px;
+            padding: 8px 22px 8px 14px;
+            border-radius: 980px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--surface);
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.2s forwards;
         }
 
-        .hero-badge span {
-            color: var(--gold);
-            font-weight: 600;
+        .hero-pill-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: dotPulse 2.5s ease-in-out infinite;
         }
 
-        .hero-icon {
-            width: 96px;
-            height: 96px;
-            border-radius: 22px;
-            margin-bottom: 32px;
-            position: relative;
-            z-index: 1;
+        @keyframes dotPulse {
+            0%, 100% { box-shadow: 0 0 8px var(--green); }
+            50% { box-shadow: 0 0 14px var(--green), 0 0 4px var(--green); }
+        }
+
+        .hero-lockicon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 36px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.35s forwards, heroFloat 4s ease-in-out 1.2s infinite;
+        }
+
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
 
         .hero h1 {
-            font-size: clamp(40px, 7vw, 72px);
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            margin-bottom: 20px;
+            font-size: clamp(42px, 7vw, 76px);
+            font-weight: 900;
+            letter-spacing: -0.035em;
+            line-height: 1.05;
+            margin-bottom: 24px;
             position: relative;
             z-index: 1;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.45s forwards;
         }
 
         .hero h1 .gold {
-            color: var(--gold);
+            background: linear-gradient(135deg, #FFE566, #FFD213, #E6B800);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .hero p {
-            font-size: clamp(16px, 2.5vw, 20px);
-            color: var(--text-secondary);
-            max-width: 560px;
-            margin-bottom: 40px;
+        .hero-sub {
+            font-size: clamp(16px, 2vw, 19px);
+            color: var(--text-dim);
+            max-width: 520px;
+            margin-bottom: 44px;
+            font-weight: 400;
+            line-height: 1.65;
             position: relative;
             z-index: 1;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.6s forwards;
         }
 
         .hero-buttons {
             display: flex;
-            gap: 16px;
+            gap: 14px;
             flex-wrap: wrap;
             justify-content: center;
             position: relative;
             z-index: 1;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.7s forwards;
         }
 
-        .btn-primary {
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== APP MOCKUP ===== */
+        .hero-mockup {
+            width: 100%;
+            max-width: 680px;
+            margin-top: 72px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.9s forwards;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mockup-window {
+            background: #1A1A1A;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .mockup-titlebar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 18px;
+            background: #222222;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mockup-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .mockup-dot-r { background: #FF5F57; }
+        .mockup-dot-y { background: #FEBC2E; }
+        .mockup-dot-g { background: #28C840; }
+
+        .mockup-titlebar span {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 500;
+            margin-right: 44px;
+        }
+
+        .mockup-body {
+            position: relative;
+            padding: 48px 32px 56px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .mockup-blur-lines {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 24px 32px;
+            opacity: 0.08;
+        }
+
+        .mockup-blur-lines div {
+            height: 10px;
+            border-radius: 5px;
+            background: var(--text);
+        }
+
+        .mockup-lock-overlay {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 32px 48px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .mockup-lock-overlay svg {
+            opacity: 0.9;
+        }
+
+        .mockup-lock-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .mockup-lock-btn {
             background: var(--gold);
             color: var(--black);
-            padding: 14px 32px;
-            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-gold {
+            background: var(--gold);
+            color: var(--black);
+            padding: 14px 30px;
+            border-radius: 14px;
             text-decoration: none;
             font-weight: 700;
-            font-size: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 15px;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            transition: transform 0.25s, box-shadow 0.25s;
         }
 
-        .btn-primary:hover {
+        .btn-gold:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--gold-dim);
+            box-shadow: 0 12px 40px var(--gold-glow-strong);
         }
 
-        .btn-secondary {
-            background: var(--card);
+        .btn-ghost {
+            background: transparent;
             color: var(--text);
-            padding: 14px 32px;
-            border-radius: 12px;
+            padding: 14px 30px;
+            border-radius: 14px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 16px;
-            border: 1px solid var(--card-border);
-            transition: border-color 0.2s;
+            font-size: 15px;
+            border: 1px solid var(--border);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            transition: border-color 0.25s, background 0.25s;
         }
 
-        .btn-secondary:hover {
-            border-color: var(--text-secondary);
+        .btn-ghost:hover {
+            border-color: var(--border-hover);
+            background: var(--surface);
         }
 
-        /* ===== SECTIONS ===== */
-        section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 24px;
-        }
+        /* ===== SECTION LAYOUT ===== */
+        .section { padding: 100px 0; }
 
-        .section-label {
-            font-size: 13px;
-            font-weight: 600;
+        .section-eyebrow {
+            font-size: 12px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
             color: var(--gold);
-            margin-bottom: 12px;
-        }
-
-        .section-title {
-            font-size: clamp(28px, 4vw, 42px);
-            font-weight: 800;
-            letter-spacing: -0.02em;
             margin-bottom: 16px;
         }
 
-        .section-subtitle {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin-bottom: 48px;
+        .section-heading {
+            font-size: clamp(30px, 4.5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+
+        .section-desc {
+            font-size: 17px;
+            color: var(--text-dim);
+            max-width: 520px;
+            margin-bottom: 56px;
+            font-weight: 400;
         }
 
         /* ===== FEATURES ===== */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
 
-        .feature-card {
+        .f-card {
             background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 32px;
-            transition: border-color 0.3s, transform 0.3s;
-        }
-
-        .feature-card:hover {
-            border-color: var(--gold-dim);
-            transform: translateY(-4px);
-        }
-
-        .feature-icon {
-            font-size: 32px;
-            margin-bottom: 16px;
-        }
-
-        .feature-card h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* ===== COMPARISON ===== */
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .comparison-table th {
-            text-align: left;
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--card-border);
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .comparison-table th:first-child {
-            width: 40%;
-        }
-
-        .comparison-table th.highlight {
-            color: var(--gold);
-        }
-
-        .comparison-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .comparison-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .comparison-table .feature-name {
-            font-weight: 500;
-        }
-
-        .check {
-            color: var(--green);
-            font-weight: 700;
-        }
-
-        .cross {
-            color: var(--text-secondary);
-            opacity: 0.4;
-        }
-
-        .paid {
-            color: var(--gold);
-            font-size: 12px;
-        }
-
-        .comparison-wrapper {
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            transition: border-color 0.4s, transform 0.4s, background 0.4s;
+            position: relative;
             overflow: hidden;
         }
 
-        /* ===== HOW IT WORKS ===== */
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 32px;
-            counter-reset: step;
+        .f-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-glow-strong), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
         }
 
-        .step {
-            position: relative;
-            padding: 32px;
-            background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            counter-increment: step;
+        .f-card:hover {
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+            transform: translateY(-4px);
         }
 
-        .step::before {
-            content: counter(step);
+        .f-card:hover::before { opacity: 1; }
+
+        .f-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--gold-glow);
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .f-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: var(--gold);
+            fill: none;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .f-card h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .f-card p {
+            font-size: 14px;
+            color: var(--text-dim);
+            line-height: 1.65;
+            font-weight: 400;
+        }
+
+        /* ===== COMPARISON ===== */
+        .comp-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            align-items: start;
+        }
+
+        .comp-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            position: relative;
+            transition: border-color 0.4s, transform 0.4s, background 0.4s;
+        }
+
+        .comp-card:hover {
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+            transform: translateY(-4px);
+        }
+
+        .comp-card.featured:hover {
+            border-color: var(--gold);
+        }
+
+        .comp-card.featured {
+            border-color: var(--gold);
+            background: linear-gradient(180deg, rgba(255, 210, 19, 0.04) 0%, var(--card) 40%);
+        }
+
+        .comp-card.featured::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 0 0 2px 2px;
+        }
+
+        .comp-name {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .comp-price {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 28px;
+            font-weight: 400;
+        }
+
+        .comp-price strong {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .comp-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .comp-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        .comp-list .ic {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+
+        .ic-yes { background: rgba(48, 209, 88, 0.15); }
+        .ic-yes svg { stroke: var(--green); }
+        .ic-no { background: rgba(255, 69, 58, 0.1); }
+        .ic-no svg { stroke: var(--red); opacity: 0.5; }
+        .ic-paid { background: var(--gold-glow); }
+        .ic-paid svg { stroke: var(--gold); }
+        .comp-list .dim { color: var(--text-dim); }
+
+        /* ===== HOW IT WORKS ===== */
+        .steps-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            counter-reset: steps;
+        }
+
+        .step-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px 28px;
+            counter-increment: steps;
+            position: relative;
+            transition: border-color 0.4s, transform 0.4s, background 0.4s;
+        }
+
+        .step-card:hover {
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+            transform: translateY(-4px);
+        }
+
+        .step-num {
             width: 36px;
             height: 36px;
             border-radius: 10px;
@@ -394,421 +621,515 @@
             color: var(--black);
             font-weight: 800;
             font-size: 16px;
-            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
         }
 
-        .step h3 {
-            font-size: 18px;
+        .step-card h3 {
+            font-size: 17px;
             font-weight: 700;
             margin-bottom: 8px;
+            letter-spacing: -0.01em;
         }
 
-        .step p {
+        .step-card p {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: var(--text-dim);
+            line-height: 1.65;
         }
 
-        /* ===== OPEN SOURCE ===== */
-        .oss-banner {
-            background: linear-gradient(135deg, var(--card) 0%, #1a1500 100%);
-            border: 1px solid var(--gold-dim);
-            border-radius: 20px;
-            padding: 64px 48px;
+        /* ===== OSS BANNER ===== */
+        .oss-section { padding: 40px 0 100px; }
+
+        .oss-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 72px 48px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .oss-banner h2 {
-            font-size: clamp(24px, 3.5vw, 36px);
-            font-weight: 800;
+        .oss-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at top center, var(--gold-glow) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .oss-card h2 {
+            font-size: clamp(26px, 3.5vw, 40px);
+            font-weight: 900;
+            letter-spacing: -0.03em;
             margin-bottom: 16px;
+            position: relative;
         }
 
-        .oss-banner p {
-            color: var(--text-secondary);
+        .oss-card > p {
+            color: var(--text-dim);
             font-size: 16px;
-            max-width: 500px;
-            margin: 0 auto 32px;
+            max-width: 460px;
+            margin: 0 auto 40px;
+            position: relative;
         }
 
-        .oss-badges {
+        .oss-stats {
             display: flex;
-            gap: 32px;
+            gap: 48px;
             justify-content: center;
             flex-wrap: wrap;
+            position: relative;
         }
 
-        .oss-badge {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
+        .oss-stat { text-align: center; }
 
-        .oss-badge .value {
-            font-size: 24px;
-            font-weight: 800;
+        .oss-stat .val {
+            font-size: 28px;
+            font-weight: 900;
             color: var(--gold);
+            letter-spacing: -0.02em;
         }
 
-        .oss-badge .label {
-            font-size: 12px;
-            color: var(--text-secondary);
+        .oss-stat .lbl {
+            font-size: 11px;
+            color: var(--text-dim);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            margin-top: 2px;
         }
 
         /* ===== DOWNLOAD ===== */
-        .download-section {
+        .dl-section {
             text-align: center;
-            padding: 80px 24px 120px;
+            padding: 40px 0 100px;
         }
 
-        .download-section h2 {
-            font-size: clamp(28px, 4vw, 42px);
-            font-weight: 800;
-            margin-bottom: 12px;
+        .dl-section h2 {
+            font-size: clamp(30px, 4.5vw, 48px);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
         }
 
-        .download-section p {
-            color: var(--text-secondary);
-            font-size: 16px;
-            margin-bottom: 40px;
+        .dl-sub {
+            color: var(--text-dim);
+            font-size: 17px;
+            margin-bottom: 72px;
         }
 
-        .download-options {
+        .dl-buttons {
             display: flex;
-            gap: 16px;
+            gap: 14px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
-        .brew-command {
+        .brew-line {
             display: inline-block;
             background: var(--card);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            font-size: 14px;
-            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-dim);
+            cursor: text;
+            user-select: all;
+            -webkit-user-select: all;
+            transition: border-color 0.3s;
         }
 
-        .brew-command span {
-            color: var(--gold);
-        }
+        .brew-line:hover { border-color: var(--border-hover); }
+
+        .brew-line .prompt { color: var(--gold); }
+        .brew-line .muted { opacity: 0.35; }
 
         /* ===== FOOTER ===== */
         footer {
-            border-top: 1px solid var(--card-border);
-            padding: 32px 24px;
+            border-top: 1px solid var(--border);
+            padding: 28px 24px;
             text-align: center;
             font-size: 13px;
-            color: var(--text-secondary);
+            color: var(--text-dim);
         }
 
         footer a {
-            color: var(--text-secondary);
+            color: var(--text-dim);
             text-decoration: none;
             transition: color 0.2s;
         }
 
-        footer a:hover {
-            color: var(--text);
-        }
+        footer a:hover { color: var(--text); }
 
         /* ===== ANIMATIONS ===== */
-        .fade-in {
+        .reveal {
             opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            transform: translateY(28px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .fade-in.visible {
+        .reveal.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
+        .reveal-delay-1 { transition-delay: 0.08s; }
+        .reveal-delay-2 { transition-delay: 0.16s; }
+        .reveal-delay-3 { transition-delay: 0.24s; }
+
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
+        @media (max-width: 900px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .comp-grid { grid-template-columns: 1fr; max-width: 480px; }
+            .steps-row { grid-template-columns: 1fr; max-width: 480px; }
+            .hero-mockup { max-width: 100%; }
+        }
 
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 540px) {
+            .features-grid { grid-template-columns: 1fr; }
+            .comp-grid { max-width: 100%; }
+            .steps-row { max-width: 100%; }
+        }
 
-            .steps {
-                grid-template-columns: 1fr;
-            }
-
-            .oss-banner {
-                padding: 40px 24px;
-            }
-
-            .comparison-table {
-                font-size: 13px;
-            }
-
-            .comparison-table td,
-            .comparison-table th {
-                padding: 10px 12px;
-            }
+        @media (max-width: 640px) {
+            .nav-links { display: none; }
+            .hero { padding: 120px 20px 48px; }
+            .hero-buttons { flex-direction: column; width: 100%; padding: 0 12px; }
+            .hero-buttons .btn-gold,
+            .hero-buttons .btn-ghost { width: 100%; justify-content: center; }
+            .dl-buttons { flex-direction: column; padding: 0 12px; }
+            .dl-buttons .btn-gold,
+            .dl-buttons .btn-ghost { width: 100%; justify-content: center; }
+            .oss-card { padding: 48px 24px; }
+            .oss-stats { gap: 28px; }
+            .mockup-body { padding: 32px 20px 40px; }
+            .mockup-lock-overlay { padding: 24px 32px; }
+            .brew-line { font-size: 11px; padding: 10px 16px; }
+            .brew-line .muted { display: none; }
+            .dl-sub { margin-bottom: 48px; }
+            .mockup-lock-btn { font-size: 12px; padding: 10px 20px; white-space: nowrap; }
         }
     </style>
 </head>
 <body>
+
     <!-- NAV -->
     <nav>
         <div class="nav-inner">
             <a href="#" class="nav-logo">
-                <img src="https://raw.githubusercontent.com/dutkiewiczmaciej/MakLock/main/Resources/icon.png" alt="MakLock">
+                <img src="icon.png" alt="MakLock" width="44" height="44" style="border-radius: 10px;">
                 MakLock
             </a>
             <ul class="nav-links">
                 <li><a href="#features">Features</a></li>
-                <li><a href="#comparison">Compare</a></li>
+                <li><a href="#compare">Compare</a></li>
                 <li><a href="#how-it-works">How It Works</a></li>
                 <li><a href="#download">Download</a></li>
             </ul>
-            <a href="https://github.com/dutkiewiczmaciej/MakLock" class="nav-cta">View on GitHub</a>
+            <a href="https://github.com/dutkiewiczmaciej/MakLock" class="nav-cta">GitHub</a>
         </div>
     </nav>
 
     <!-- HERO -->
     <div class="hero">
-        <div class="hero-badge">
-            <span>Open Source</span> &mdash; Free forever, MIT licensed
+        <div class="hero-glow"></div>
+
+        <div class="hero-pill">
+            <span class="hero-pill-dot"></span>
+            Open source &middot; Free forever
         </div>
-        <img src="https://raw.githubusercontent.com/dutkiewiczmaciej/MakLock/main/Resources/icon.png" alt="MakLock" class="hero-icon">
-        <h1>Lock any app.<br><span class="gold">Touch ID. Apple Watch.</span><br>Free.</h1>
-        <p>The only open-source app locker for macOS. Protect your apps with Touch ID, Apple Watch proximity, or password &mdash; more features than paid alternatives.</p>
+
+        <svg class="hero-lockicon" viewBox="0 0 80 80" fill="none">
+            <rect x="10" y="34" width="60" height="42" rx="8" stroke="#FFD213" stroke-width="3"/>
+            <path d="M24 34V26a16 16 0 0 1 32 0v8" stroke="#FFD213" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="40" cy="52" r="5" fill="#FFD213"/>
+            <path d="M40 57v6" stroke="#FFD213" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+
+        <h1>Lock any app.<br><span class="gold">Touch ID. Apple Watch.</span></h1>
+
+        <p class="hero-sub">The only open-source app locker for macOS. More features than paid alternatives &mdash; completely free.</p>
+
         <div class="hero-buttons">
-            <a href="https://github.com/dutkiewiczmaciej/MakLock/releases/latest" class="btn-primary">
+            <a href="https://github.com/dutkiewiczmaciej/MakLock/releases/latest" class="btn-gold">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 Download for Mac
             </a>
-            <a href="https://github.com/dutkiewiczmaciej/MakLock" class="btn-secondary">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                View Source
+            <a href="https://github.com/dutkiewiczmaciej/MakLock" class="btn-ghost">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                View on GitHub
             </a>
+        </div>
+
+        <!-- App Mockup -->
+        <div class="hero-mockup">
+            <div class="mockup-window">
+                <div class="mockup-titlebar">
+                    <div class="mockup-dot mockup-dot-r"></div>
+                    <div class="mockup-dot mockup-dot-y"></div>
+                    <div class="mockup-dot mockup-dot-g"></div>
+                    <span>Messages</span>
+                </div>
+                <div class="mockup-body">
+                    <div class="mockup-blur-lines">
+                        <div style="width: 65%"></div>
+                        <div style="width: 90%"></div>
+                        <div style="width: 45%"></div>
+                        <div style="width: 80%"></div>
+                        <div style="width: 55%"></div>
+                        <div style="width: 70%"></div>
+                    </div>
+                    <div class="mockup-lock-overlay">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFD213" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <div class="mockup-lock-text">Messages is locked</div>
+                        <div class="mockup-lock-btn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2c0 .47 0 1.17-.02 2"/></svg>
+                            Unlock with Touch ID
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- FEATURES -->
-    <section id="features">
-        <div class="fade-in">
-            <div class="section-label">Features</div>
-            <h2 class="section-title">Everything you need to lock your apps.</h2>
-            <p class="section-subtitle">More features than paid alternatives &mdash; and it's completely free.</p>
-        </div>
-        <div class="features-grid">
-            <div class="feature-card fade-in">
-                <div class="feature-icon">&#x1F91A;</div>
-                <h3>Touch ID</h3>
-                <p>Unlock protected apps instantly with your fingerprint. Single prompt &mdash; no double authentication like other apps.</p>
+    <section id="features" class="section">
+        <div class="container">
+            <div class="reveal">
+                <div class="section-eyebrow">Features</div>
+                <h2 class="section-heading">Everything you need.<br>Nothing you don't.</h2>
+                <p class="section-desc">Built for privacy-conscious Mac users who want real app protection &mdash; not security theater.</p>
             </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon">&#x231A;</div>
-                <h3>Apple Watch Unlock</h3>
-                <p>Automatically unlock apps when your Apple Watch is on your wrist and nearby. Uses BLE wrist detection &mdash; no other app locker does this.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon">&#x1F4F4;</div>
-                <h3>Auto-Close on Sleep</h3>
-                <p>Messaging apps like WhatsApp and iMessage are terminated when your laptop sleeps. No one can snoop your notifications.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon">&#x23F1;</div>
-                <h3>Auto-Close Inactive Apps</h3>
-                <p>Protected apps are automatically closed after a configurable inactivity timeout. Per-app control &mdash; choose which apps get auto-closed.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon">&#x1F5A5;</div>
-                <h3>Multi-Monitor Overlay</h3>
-                <p>Full-screen blur overlay appears on all connected displays simultaneously. No way to peek at content on another monitor.</p>
-            </div>
-            <div class="feature-card fade-in">
-                <div class="feature-icon">&#x1F6A8;</div>
-                <h3>Panic Key</h3>
-                <p>Emergency exit with Cmd+Opt+Shift+Ctrl+U. System apps like Terminal and Xcode can never be locked. Multiple safety failsafes built in.</p>
+
+            <div class="features-grid">
+                <!-- Touch ID -->
+                <div class="f-card reveal reveal-delay-1">
+                    <div class="f-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2c0 .47 0 1.17-.02 2"/></svg>
+                    </div>
+                    <h3>Touch ID</h3>
+                    <p>Single fingerprint prompt unlocks instantly. No double authentication, no clunky password dialogs.</p>
+                </div>
+
+                <!-- Apple Watch -->
+                <div class="f-card reveal reveal-delay-2">
+                    <div class="f-icon">
+                        <svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="4"/><path d="M12 9v2"/><circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/><path d="M9 1h6"/><path d="M9 23h6"/></svg>
+                    </div>
+                    <h3>Apple Watch</h3>
+                    <p>Apps unlock automatically when your Watch is on your wrist and nearby. BLE wrist detection &mdash; no other app locker has this.</p>
+                </div>
+
+                <!-- Lock on Switch -->
+                <div class="f-card reveal reveal-delay-3">
+                    <div class="f-icon">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 10h2"/><path d="M15 10h2"/></svg>
+                    </div>
+                    <h3>Lock on App Switch</h3>
+                    <p>Re-locks every time you switch to a protected app. Not just on launch &mdash; on every activation. No gaps in protection.</p>
+                </div>
+
+                <!-- Auto-Close on Sleep -->
+                <div class="f-card reveal reveal-delay-1">
+                    <div class="f-icon">
+                        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </div>
+                    <h3>Close on Sleep</h3>
+                    <p>Close your laptop &mdash; messaging apps are terminated instantly. Nobody can snoop your conversations later.</p>
+                </div>
+
+                <!-- Auto-Close Inactive -->
+                <div class="f-card reveal reveal-delay-2">
+                    <div class="f-icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h3>Auto-Close Inactive</h3>
+                    <p>Protected apps close after a configurable timeout. Per-app control &mdash; keep your editor open, close your messengers.</p>
+                </div>
+
+                <!-- Multi-Monitor -->
+                <div class="f-card reveal reveal-delay-3">
+                    <div class="f-icon">
+                        <svg viewBox="0 0 24 24"><rect x="1" y="4" width="10" height="8" rx="1.5"/><rect x="13" y="4" width="10" height="8" rx="1.5"/><path d="M6 16v2"/><path d="M18 16v2"/><path d="M3 18h6"/><path d="M15 18h6"/></svg>
+                    </div>
+                    <h3>Multi-Monitor</h3>
+                    <p>Blur overlay covers all connected displays simultaneously. No peeking at content on the other screen.</p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- COMPARISON -->
-    <section id="comparison">
-        <div class="fade-in">
-            <div class="section-label">Compare</div>
-            <h2 class="section-title">Why choose MakLock?</h2>
-            <p class="section-subtitle">See how MakLock compares to paid alternatives.</p>
-        </div>
-        <div class="comparison-wrapper fade-in">
-            <table class="comparison-table">
-                <thead>
-                    <tr>
-                        <th>Feature</th>
-                        <th class="highlight">MakLock (Free)</th>
-                        <th>AppLocker ($17.99)</th>
-                        <th>AppCrypt ($19.99/yr)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="feature-name">Touch ID</td>
-                        <td><span class="check">&#10003;</span></td>
-                        <td><span class="paid">Paid only</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Lock on app switch</td>
-                        <td><span class="check">&#10003;</span></td>
-                        <td><span class="cross">&#10005;</span> Launch only</td>
-                        <td><span class="check">&#10003;</span></td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Apple Watch unlock</td>
-                        <td><span class="check">&#10003;</span> Wrist detection</td>
-                        <td><span class="cross">&#10005;</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Blur overlay</td>
-                        <td><span class="check">&#10003;</span> All monitors</td>
-                        <td>Basic panel</td>
-                        <td>Dialog box</td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Auto-close apps</td>
-                        <td><span class="check">&#10003;</span></td>
-                        <td><span class="cross">&#10005;</span> Sandbox</td>
-                        <td><span class="cross">&#10005;</span> Sandbox</td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Close on sleep</td>
-                        <td><span class="check">&#10003;</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Auto-lock on idle</td>
-                        <td><span class="check">&#10003;</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                        <td><span class="check">&#10003;</span></td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Auto-lock on sleep</td>
-                        <td><span class="check">&#10003;</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Open source</td>
-                        <td><span class="check">&#10003;</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                        <td><span class="cross">&#10005;</span></td>
-                    </tr>
-                    <tr>
-                        <td class="feature-name">Bypass resistant</td>
-                        <td><span class="check">&#10003;</span></td>
-                        <td><span class="cross">&#10005;</span> Bundle ID edit</td>
-                        <td>Unknown</td>
-                    </tr>
-                </tbody>
-            </table>
+    <section id="compare" class="section" style="padding-top: 60px;">
+        <div class="container">
+            <div class="reveal">
+                <div class="section-eyebrow">Compare</div>
+                <h2 class="section-heading">Free beats paid.</h2>
+                <p class="section-desc">See how MakLock stacks up against the most popular alternatives.</p>
+            </div>
+
+            <div class="comp-grid reveal">
+                <!-- MakLock -->
+                <div class="comp-card featured">
+                    <div class="comp-name">MakLock</div>
+                    <div class="comp-price"><strong>Free</strong> &mdash; forever</div>
+                    <ul class="comp-list">
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Touch ID unlock</li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Apple Watch wrist detection</li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Lock on app switch</li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Blur overlay, all monitors</li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Auto-close &amp; close on sleep</li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Auto-lock on idle &amp; sleep</li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Open source (MIT)</li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Unlimited apps</li>
+                    </ul>
+                </div>
+
+                <!-- AppLocker -->
+                <div class="comp-card">
+                    <div class="comp-name" style="color: var(--text-dim);">AppLocker</div>
+                    <div class="comp-price">$17.99 one-time</div>
+                    <ul class="comp-list">
+                        <li><span class="ic ic-paid"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span class="dim">Touch ID &mdash; paid only</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">No Apple Watch</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">Launch only &mdash; no re-lock</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">Basic panel, no blur</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">Can't close apps (sandbox)</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">No auto-lock</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">Closed source</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">Free tier: 1 app only</span></li>
+                    </ul>
+                </div>
+
+                <!-- AppCrypt -->
+                <div class="comp-card">
+                    <div class="comp-name" style="color: var(--text-dim);">AppCrypt</div>
+                    <div class="comp-price">$19.99/year</div>
+                    <ul class="comp-list">
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">No Touch ID</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">No Apple Watch</span></li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Lock on app switch</li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">Dialog box only</span></li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">Can't close apps (sandbox)</span></li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Auto-lock on idle</li>
+                        <li><span class="ic ic-no"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="dim">Closed source</span></li>
+                        <li><span class="ic ic-yes"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Website blocking</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- HOW IT WORKS -->
-    <section id="how-it-works">
-        <div class="fade-in">
-            <div class="section-label">How It Works</div>
-            <h2 class="section-title">Three steps to protect your apps.</h2>
-            <p class="section-subtitle">Set it up once, MakLock runs silently in your menu bar.</p>
-        </div>
-        <div class="steps">
-            <div class="step fade-in">
-                <h3>Add your apps</h3>
-                <p>Open MakLock settings and add the apps you want to protect. Toggle per-app settings like auto-close.</p>
+    <section id="how-it-works" class="section" style="padding-bottom: 80px;">
+        <div class="container">
+            <div class="reveal">
+                <div class="section-eyebrow">How It Works</div>
+                <h2 class="section-heading">Set up in seconds.</h2>
+                <p class="section-desc">MakLock runs silently in your menu bar. No Dock icon, no distractions.</p>
             </div>
-            <div class="step fade-in">
-                <h3>Switch to a protected app</h3>
-                <p>When you (or anyone) opens or switches to a protected app, MakLock instantly shows a blur overlay blocking all content.</p>
-            </div>
-            <div class="step fade-in">
-                <h3>Authenticate</h3>
-                <p>Touch ID, Apple Watch proximity, or password. Once authenticated, the app is yours. It re-locks on idle, sleep, or when your Watch leaves range.</p>
+
+            <div class="steps-row">
+                <div class="step-card reveal reveal-delay-1">
+                    <div class="step-num">1</div>
+                    <h3>Add your apps</h3>
+                    <p>Choose which apps to protect. Toggle per-app settings like auto-close for messaging apps.</p>
+                </div>
+                <div class="step-card reveal reveal-delay-2">
+                    <div class="step-num">2</div>
+                    <h3>Apps get locked</h3>
+                    <p>When anyone opens or switches to a protected app, a blur overlay instantly blocks all content on every monitor.</p>
+                </div>
+                <div class="step-card reveal reveal-delay-3">
+                    <div class="step-num">3</div>
+                    <h3>Authenticate</h3>
+                    <p>Touch ID, Apple Watch on your wrist, or password. Re-locks on idle, sleep, or when your Watch leaves range.</p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- OPEN SOURCE -->
-    <section>
-        <div class="oss-banner fade-in">
-            <h2>100% Free. 100% Open Source.</h2>
-            <p>No subscriptions, no trials, no feature gates. MakLock is MIT licensed with no telemetry and no data collection.</p>
-            <div class="oss-badges">
-                <div class="oss-badge">
-                    <span class="value">$0</span>
-                    <span class="label">Forever</span>
-                </div>
-                <div class="oss-badge">
-                    <span class="value">MIT</span>
-                    <span class="label">License</span>
-                </div>
-                <div class="oss-badge">
-                    <span class="value">Zero</span>
-                    <span class="label">Telemetry</span>
-                </div>
-                <div class="oss-badge">
-                    <span class="value">Zero</span>
-                    <span class="label">Data Collection</span>
+    <div class="oss-section">
+        <div class="container">
+            <div class="oss-card reveal">
+                <h2>100% Free. Open Source.</h2>
+                <p>No subscriptions. No trials. No feature gates. No telemetry. No data collection. Just privacy.</p>
+                <div class="oss-stats">
+                    <div class="oss-stat">
+                        <div class="val">$0</div>
+                        <div class="lbl">Forever</div>
+                    </div>
+                    <div class="oss-stat">
+                        <div class="val">MIT</div>
+                        <div class="lbl">License</div>
+                    </div>
+                    <div class="oss-stat">
+                        <div class="val">0 bytes</div>
+                        <div class="lbl">Data Collected</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- DOWNLOAD -->
-    <section id="download" class="download-section">
-        <div class="fade-in">
-            <h2>Ready to lock your apps?</h2>
-            <p>Download MakLock for free. macOS 13 Ventura or later.</p>
-            <div class="download-options">
-                <a href="https://github.com/dutkiewiczmaciej/MakLock/releases/latest" class="btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Download .dmg
-                </a>
-                <a href="https://github.com/dutkiewiczmaciej/MakLock" class="btn-secondary">
-                    View on GitHub
-                </a>
-            </div>
-            <div class="brew-command">
-                <span>$</span> brew install --cask maklock &nbsp;<span style="opacity:0.4">// coming soon</span>
+    <div id="download" class="dl-section">
+        <div class="container">
+            <div class="reveal">
+                <h2>Ready to lock your apps?</h2>
+                <p class="dl-sub">macOS 13 Ventura or later. Apple Silicon &amp; Intel.</p>
+                <div class="dl-buttons">
+                    <a href="https://github.com/dutkiewiczmaciej/MakLock/releases/latest" class="btn-gold">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download for Mac
+                    </a>
+                    <a href="https://github.com/dutkiewiczmaciej/MakLock" class="btn-ghost">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        View on GitHub
+                    </a>
+                </div>
+                <div class="brew-line">
+                    <span class="prompt">$</span> brew install --cask maklock <span class="muted">// coming soon</span>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- FOOTER -->
     <footer>
-        <p>
-            Made by <a href="https://github.com/dutkiewiczmaciej">MakMak</a> &nbsp;&middot;&nbsp;
-            <a href="https://github.com/dutkiewiczmaciej/MakLock">GitHub</a> &nbsp;&middot;&nbsp;
-            <a href="https://github.com/dutkiewiczmaciej/MakLock/blob/main/LICENSE">MIT License</a>
-        </p>
+        &copy; 2026 <a href="https://github.com/dutkiewiczmaciej">MakMak</a> &nbsp;&middot;&nbsp;
+        <a href="https://github.com/dutkiewiczmaciej/MakLock">GitHub</a> &nbsp;&middot;&nbsp;
+        <a href="https://github.com/dutkiewiczmaciej/MakLock/blob/main/LICENSE">MIT License</a>
     </footer>
 
-    <!-- SCROLL ANIMATION -->
     <script>
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+        // Reveal on scroll
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+        // Nav scroll-spy
+        const sections = document.querySelectorAll('section[id], div[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const navSpy = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    navLinks.forEach(a => a.classList.remove('active'));
+                    const link = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+                    if (link) link.classList.add('active');
                 }
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        }, { threshold: 0.2, rootMargin: '-80px 0px -50% 0px' });
+        sections.forEach(s => navSpy.observe(s));
     </script>
 </body>
 </html>
