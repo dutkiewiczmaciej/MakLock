@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-14
+    strategy:
+      matrix:
+        destination: ['platform=macOS']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app || sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build
+        run: |
+          xcodebuild build \
+            -project MakLock.xcodeproj \
+            -scheme MakLock \
+            -destination "${{ matrix.destination }}" \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || true
+
+      - name: Build Release
+        run: |
+          xcodebuild build \
+            -project MakLock.xcodeproj \
+            -scheme MakLock \
+            -destination "${{ matrix.destination }}" \
+            -configuration Release \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || true
