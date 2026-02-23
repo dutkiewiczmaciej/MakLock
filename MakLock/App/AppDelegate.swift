@@ -8,6 +8,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         menuBarController.setup()
 
+        // Initialize Sparkle auto-updater
+        UpdateService.shared.start()
+
         // Request notification permission (for Watch unlock notifications)
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
 

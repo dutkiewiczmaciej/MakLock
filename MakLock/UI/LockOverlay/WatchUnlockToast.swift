@@ -55,10 +55,12 @@ final class WatchUnlockToast {
             toast.animator().alphaValue = 1
         }
 
-        // Auto-dismiss after 4 seconds
-        dismissTimer = Timer.scheduledTimer(withTimeInterval: 4.0, repeats: false) { [weak self] _ in
+        // Auto-dismiss after 4 seconds (use .common mode so it fires during modal dialogs)
+        let timer = Timer(timeInterval: 4.0, repeats: false) { [weak self] _ in
             self?.dismiss()
         }
+        RunLoop.main.add(timer, forMode: .common)
+        dismissTimer = timer
     }
 
     /// Find the screen containing the frontmost window of the given app.
