@@ -70,6 +70,41 @@ final class AuthenticationService {
         }
     }
 
+    /// Authenticate with Touch ID, falling back to macOS login password.
+    /// Used for settings access gating — shows the native system dialog, not the full-screen overlay.
+    func authenticateWithSystemFallback(reason: String, completion: @escaping (AuthResult) -> Void) {
+        guard !isAuthenticating else {
+            completion(.cancelled)
+            return
+        }
+
+        let context = LAContext()
+        var error: NSError?
+
+        guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
+            completion(.failure(mapLAError(error)))
+            return
+        }
+
+        isAuthenticating = true
+        activeContext = context
+
+        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
+            DispatchQueue.main.async {
+                self.isAuthenticating = false
+                self.activeContext = nil
+
+                if success {
+                    completion(.success)
+                } else if let error = error as? LAError, error.code == .userCancel {
+                    completion(.cancelled)
+                } else {
+                    completion(.failure(self.mapLAError(error as NSError?)))
+                }
+            }
+        }
+    }
+
     /// Check if Touch ID is available on this Mac.
     var isTouchIDAvailable: Bool {
         let context = LAContext()
