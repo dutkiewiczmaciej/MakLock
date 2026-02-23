@@ -4,6 +4,8 @@ import ServiceManagement
 /// General settings tab: launch at login, idle auto-lock, sleep auto-lock.
 struct GeneralSettingsView: View {
     @State private var settings = Defaults.shared.appSettings
+    private let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    private let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
 
     var body: some View {
         Form {
@@ -71,6 +73,25 @@ struct GeneralSettingsView: View {
                 Text("Apps with the timer icon enabled will quit after this period of inactivity.")
                     .font(MakLockTypography.caption)
                     .foregroundColor(MakLockColors.textSecondary)
+            }
+
+            Section {
+                Button("Check for Updates…") {
+                    UpdateService.shared.updater.checkForUpdates()
+                }
+
+                HStack(spacing: 8) {
+                    Text("MakLock \(version) (\(build))  ·  Made by MakMak")
+                        .foregroundColor(MakLockColors.textSecondary)
+                    Link(destination: URL(string: "https://github.com/dutkiewiczmaciej/MakLock")!) {
+                        HStack(spacing: 3) {
+                            Image(systemName: "arrow.up.right.square")
+                            Text("GitHub")
+                        }
+                        .foregroundColor(MakLockColors.gold)
+                    }
+                }
+                .font(MakLockTypography.caption)
             }
         }
         .formStyle(.grouped)

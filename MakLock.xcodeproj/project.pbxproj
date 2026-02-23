@@ -52,6 +52,8 @@
 		A10000000000000000000E01 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000E11 /* AboutView.swift */; };
 		A10000000000000000000F03 /* HotKey in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000F02 /* HotKey */; };
 		A10000000000000000001001 /* SettingsAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000001011 /* SettingsAuthService.swift */; };
+		A10000000000000000001101 /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000001111 /* UpdateService.swift */; };
+		A10000000000000000001203 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000001202 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -102,6 +104,7 @@
 		A10000000000000000000D12 /* OnboardingWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWindow.swift; sourceTree = "<group>"; };
 		A10000000000000000000E11 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		A10000000000000000001011 /* SettingsAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAuthService.swift; sourceTree = "<group>"; };
+		A10000000000000000001111 /* UpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +113,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000F03 /* HotKey in Frameworks */,
+				A10000000000000000001203 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -184,6 +188,7 @@
 				A10000000000000000000C11 /* WatchProximityService.swift */,
 				4D8AAF1355AD0ACA8137F01D /* AppInactivityService.swift */,
 				A10000000000000000001011 /* SettingsAuthService.swift */,
+				A10000000000000000001111 /* UpdateService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -323,6 +328,7 @@
 			name = MakLock;
 			packageProductDependencies = (
 				A10000000000000000000F02 /* HotKey */,
+				A10000000000000000001202 /* Sparkle */,
 			);
 			productName = MakLock;
 			productReference = A10000000000000000000010 /* MakLock.app */;
@@ -354,6 +360,7 @@
 			mainGroup = A10000000000000000000030;
 			packageReferences = (
 				A10000000000000000000F01 /* XCRemoteSwiftPackageReference "HotKey" */,
+				A10000000000000000001201 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = A10000000000000000000034 /* Products */;
 			projectDirPath = "";
@@ -423,6 +430,7 @@
 				A10000000000000000000E01 /* AboutView.swift in Sources */,
 				3C36B23C6F719E84D10ECE91 /* AppInactivityService.swift in Sources */,
 				A10000000000000000001001 /* SettingsAuthService.swift in Sources */,
+				A10000000000000000001101 /* UpdateService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -633,6 +641,14 @@
 				minimumVersion = 0.2.1;
 			};
 		};
+		A10000000000000000001201 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -640,6 +656,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A10000000000000000000F01 /* XCRemoteSwiftPackageReference "HotKey" */;
 			productName = HotKey;
+		};
+		A10000000000000000001202 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000001201 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

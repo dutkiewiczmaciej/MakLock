@@ -61,6 +61,7 @@ AppLocker only locks apps on launch — if an app is already open, switching bac
 - [x] Multi-monitor support
 - [x] First launch onboarding
 - [x] Settings with tabbed UI
+- [x] Automatic updates via Sparkle 2
 - [ ] Trusted Wi-Fi auto-unlock *(coming in v1.1)*
 - [ ] Per-window overlay *(coming in v1.2)*
 
@@ -126,7 +127,7 @@ MakLock/
   Resources/  Assets, Info.plist, Entitlements
 ```
 
-**Key frameworks:** SwiftUI, AppKit, LocalAuthentication, CoreBluetooth, IOKit, ServiceManagement, HotKey (SPM)
+**Key frameworks:** SwiftUI, AppKit, LocalAuthentication, CoreBluetooth, IOKit, ServiceManagement, HotKey (SPM), Sparkle 2 (SPM)
 
 ## Safety
 
