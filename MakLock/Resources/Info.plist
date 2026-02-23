@@ -8,6 +8,8 @@
 	<string>MakLock uses Bluetooth to detect your Apple Watch for proximity unlock.</string>
 	<key>SUFeedURL</key>
 	<string>https://dutkiewiczmaciej.github.io/maklock/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>JZ9L2BPJJm52LXVsjKZWq38xLQkBfywU0CrINPmYErE=</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
 	<key>SUScheduledCheckInterval</key>
