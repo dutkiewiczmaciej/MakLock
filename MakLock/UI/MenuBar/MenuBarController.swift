@@ -55,7 +55,12 @@ final class MenuBarController {
         if let popover, popover.isShown {
             hidePopover()
         } else {
-            popover?.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            // Require authentication before showing the popover
+            SettingsAuthService.shared.authenticate { [weak self] success in
+                guard success else { return }
+                NSApp.activate(ignoringOtherApps: true)
+                self?.popover?.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            }
         }
     }
 

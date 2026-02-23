@@ -25,7 +25,7 @@ final class WatchUnlockToast {
         toast.isOpaque = false
         toast.backgroundColor = .clear
         toast.hasShadow = false
-        toast.level = .floating
+        toast.level = .popUpMenu
         toast.hidesOnDeactivate = false
         toast.collectionBehavior = [.canJoinAllSpaces, .transient]
         toast.isMovableByWindowBackground = false
