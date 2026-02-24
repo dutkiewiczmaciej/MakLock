@@ -86,15 +86,9 @@ AppLocker only locks apps on launch — if an app is already open, switching bac
 
 ### Download
 
-Download the latest `.dmg` from [**Releases**](https://github.com/dutkiewiczmaciej/MakLock/releases/latest).
+**[Download MakLock 1.0.0](https://github.com/dutkiewiczmaciej/MakLock/releases/latest)** — open the DMG and drag to Applications.
 
-> MakLock is notarized by Apple for safe distribution outside the App Store.
-
-### Homebrew
-
-```bash
-brew install --cask maklock   # coming soon
-```
+> Signed with Developer ID and notarized by Apple. No Gatekeeper warnings — just download and run.
 
 ### Build from Source
 
@@ -111,8 +105,9 @@ Build and run with `Cmd+R`. Requires Xcode 15+ and macOS 13+.
 1. **App Monitor** — watches for protected app launches and activations via NSWorkspace
 2. **Lock Overlay** — instantly shows a full-screen blur overlay on all displays
 3. **Authentication** — prompts Touch ID, checks Apple Watch proximity, or asks for password
-4. **Auto-lock** — re-locks on idle timeout, sleep, or when Apple Watch leaves range
-5. **Auto-close** — optionally terminates inactive protected apps to prevent notification snooping
+4. **Re-lock on quit** — Cmd+Q clears authentication, so the next launch requires re-auth (even for apps that stay alive in background like Messages)
+5. **Auto-lock** — re-locks on idle timeout, sleep, or when Apple Watch leaves range
+6. **Auto-close** — optionally terminates inactive protected apps to prevent notification snooping
 
 ## Architecture
 

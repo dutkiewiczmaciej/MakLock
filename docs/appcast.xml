@@ -5,5 +5,28 @@
         <link>https://dutkiewiczmaciej.github.io/maklock/</link>
         <description>Most recent updates to MakLock</description>
         <language>en</language>
+        <item>
+            <title>MakLock 1.0.0</title>
+            <pubDate>Mon, 24 Feb 2026 03:00:00 +0000</pubDate>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[
+                <h2>MakLock 1.0.0 — First Public Release</h2>
+                <ul>
+                    <li>Lock any macOS app with Touch ID or Apple Watch</li>
+                    <li>Full-screen blur overlay on all monitors</li>
+                    <li>Auto-lock on idle, sleep, or Watch out of range</li>
+                    <li>Auto-close inactive protected apps</li>
+                    <li>Menu bar app with Touch ID/Watch protection</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/dutkiewiczmaciej/MakLock/releases/download/v1.0.0/MakLock-1.0.0.dmg"
+                type="application/octet-stream"
+                sparkle:edSignature="QB7mKQWucOWvtUOFR2DkpcYYNQNpJzzNl4333Mk9Np6AAxtWcmy3xZ8tV1SDPCsa6AhlofJji6yerPdMc68QAg=="
+                length="2463525"
+            />
+        </item>
     </channel>
 </rss>
