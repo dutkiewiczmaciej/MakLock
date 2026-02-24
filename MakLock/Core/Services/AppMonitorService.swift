@@ -56,6 +56,31 @@ final class AppMonitorService: ObservableObject {
             }
             .store(in: &cancellables)
 
+        // Monitor app deactivation — clear auth when user quits an app that stays
+        // alive in the background (e.g. Messages closes windows on Cmd+Q but process
+        // survives). Does NOT clear auth on Cmd+H (hide) or simple app switch.
+        workspace.notificationCenter.publisher(for: NSWorkspace.didDeactivateApplicationNotification)
+            .compactMap { $0.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication }
+            .sink { [weak self] app in
+                guard let bundleID = app.bundleIdentifier else { return }
+                guard self?.authenticatedApps.contains(bundleID) == true else { return }
+
+                // Delay to let window close animations finish
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                    guard let self else { return }
+                    if app.isTerminated {
+                        self.authenticatedApps.remove(bundleID)
+                        self.pendingLockBundleIDs.remove(bundleID)
+                        NSLog("[MakLock] App terminated (deactivate check), auth cleared: %@", bundleID)
+                    } else if !app.isHidden && !self.appHasWindows(app) {
+                        self.authenticatedApps.remove(bundleID)
+                        self.pendingLockBundleIDs.remove(bundleID)
+                        NSLog("[MakLock] App quit (no windows), auth cleared: %@", bundleID)
+                    }
+                }
+            }
+            .store(in: &cancellables)
+
         NSLog("[MakLock] App monitor started")
 
         // Check already-running protected apps (e.g. after MakLock restart)
@@ -121,6 +146,25 @@ final class AppMonitorService: ObservableObject {
     /// Check if an app is currently authenticated.
     func isAuthenticated(_ bundleIdentifier: String) -> Bool {
         authenticatedApps.contains(bundleIdentifier)
+    }
+
+    /// Check if an app has any normal-level windows (layer 0).
+    /// Returns false when an app was Cmd+Q'd but its process stayed alive.
+    private func appHasWindows(_ app: NSRunningApplication) -> Bool {
+        let pid = app.processIdentifier
+        guard let windowList = CGWindowListCopyWindowInfo(
+            [.optionAll], kCGNullWindowID
+        ) as? [[String: Any]] else {
+            return true // Assume yes if we can't query
+        }
+        return windowList.contains { info in
+            guard let windowPID = info[kCGWindowOwnerPID as String] as? Int32,
+                  let windowLayer = info[kCGWindowLayer as String] as? Int else {
+                return false
+            }
+            // Layer 0 = normal window level (excludes menu extras, system UI)
+            return windowPID == pid && windowLayer == 0
+        }
     }
 
     private func handleAppEvent(_ runningApp: NSRunningApplication) {
