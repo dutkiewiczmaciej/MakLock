@@ -90,6 +90,13 @@ AppLocker only locks apps on launch — if an app is already open, switching bac
 
 > Signed with Developer ID and notarized by Apple. No Gatekeeper warnings — just download and run.
 
+### Homebrew
+
+```bash
+brew tap dutkiewiczmaciej/tap
+brew install --cask maklock
+```
+
 ### Build from Source
 
 ```bash
@@ -143,6 +150,8 @@ MakLock includes multiple safety mechanisms to ensure you never get locked out:
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+If you find MakLock useful, consider giving it a [star on GitHub](https://github.com/dutkiewiczmaciej/MakLock) — it helps others discover the project.
 
 ## License
 
