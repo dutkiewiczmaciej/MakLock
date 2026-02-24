@@ -32,18 +32,20 @@ Unlike App Store alternatives, MakLock is distributed directly — giving it ful
 | **Price** | **Free forever** | 1 app free, paid for more | Trial only |
 | **Open source** | **Yes** | No | No |
 | **Touch ID** | **Yes** | Paid only | No |
-| **Lock on app switch** | **Yes** | No (launch only) | Yes |
+| **Lock on app switch** | **Yes** | No (launch only) | Yes (direct version) |
 | **Apple Watch unlock** | **Yes** (wrist detection) | No | No |
-| **Modern blur overlay** | **Yes** (all monitors) | Basic panel | Dialog box |
-| **Auto-close apps** | **Yes** | No (sandbox) | No (sandbox) |
+| **Full-screen overlay** | **Yes** (blur, all monitors) | Yes (solid, single monitor) | Dialog box |
+| **No content flash** | **Yes** (NSPanel) | No (brief flash on launch) | N/A |
+| **Auto-close apps** | **Yes** | No (sandbox) | Yes (direct version) |
 | **Close apps on sleep** | **Yes** | No | No |
 | **Auto-lock on idle** | **Yes** | No | Yes |
 | **Auto-lock on sleep** | **Yes** | No | No |
 | **Panic key** | **Yes** | No | No |
 | **Multi-monitor** | **Yes** | Unknown | No |
 | **Bypass resistant** | **Yes** | No (Bundle ID edit) | Unknown |
+| **Can't be deleted without auth** | N/A | No (sandbox) | Yes (direct version) |
 
-AppLocker only locks apps on launch — if an app is already open, switching back to it shows content without authentication. MakLock watches for app activation, not just launch, so protection works even when switching between open apps.
+AppLocker (App Store) is sandboxed — it can only intercept app launches, not activations. If an app is already running, switching back shows content without authentication. Its overlay can also freeze the entire Mac, requiring a hard reboot. MakLock uses a non-activating NSPanel overlay that never steals focus, preventing these issues.
 
 ## Features
 
