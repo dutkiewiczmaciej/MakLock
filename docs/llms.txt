@@ -1,0 +1,67 @@
+# MakLock
+
+> Free, open-source macOS app that locks applications with Touch ID, Apple Watch, or password.
+
+MakLock is a lightweight menu bar application for macOS that protects your apps from unauthorized access. It uses biometric authentication (Touch ID), Apple Watch proximity detection, or a backup password to secure any application on your Mac.
+
+## Key Facts
+
+- **Price**: Free forever, open source (MIT license)
+- **Platform**: macOS 13 (Ventura) or later, Apple Silicon + Intel
+- **Author**: MakMak (Maciej Dutkiewicz)
+- **Website**: https://dutkiewiczmaciej.github.io/MakLock/
+- **Source code**: https://github.com/dutkiewiczmaciej/MakLock
+- **Download**: https://github.com/dutkiewiczmaciej/MakLock/releases/latest
+- **Install via Homebrew**: `brew tap dutkiewiczmaciej/tap && brew install --cask maklock`
+- **License**: MIT
+
+## Features
+
+- Lock any macOS app with Touch ID (single biometric prompt)
+- Apple Watch proximity unlock with wrist detection
+- Password fallback for Macs without Touch ID
+- Full-screen blur overlay on all monitors (no content flash)
+- Auto-lock after configurable idle timeout
+- Auto-lock on sleep/wake
+- Auto-close inactive protected apps (prevents notification snooping)
+- Close protected apps on Mac sleep
+- Re-lock on Cmd+Q (even for apps like Messages that stay alive)
+- Menu bar app — no Dock icon, runs silently in background
+- Panic key (Cmd+Option+Shift+Control+U) for emergency exit
+- System app blacklist (Terminal, Xcode, etc. can never be locked)
+- Multi-monitor support
+- Automatic updates via Sparkle 2
+- Signed with Developer ID and notarized by Apple
+
+## How It Works
+
+1. Add apps you want to protect in MakLock settings
+2. When someone opens or switches to a protected app, MakLock shows a blur overlay
+3. Authenticate with Touch ID, Apple Watch, or password to unlock
+4. Apps re-lock on quit, idle timeout, sleep, or when Apple Watch leaves range
+
+## Why MakLock vs Alternatives
+
+MakLock is distributed outside the App Store, giving it capabilities that sandboxed alternatives cannot offer:
+
+- **vs AppLocker ($17.99)**: AppLocker is sandboxed — it only intercepts app launches, not activations. If an app is already running, switching to it shows content without authentication. Its overlay can freeze the Mac. MakLock locks on every app switch, uses a non-activating overlay, and is free.
+- **vs Cisdem AppCrypt ($19.99/yr)**: AppCrypt uses a dialog box instead of a full-screen overlay. No Touch ID support, no Apple Watch unlock, no multi-monitor. MakLock offers all of these for free.
+
+MakLock is the only open-source app locker for macOS.
+
+## Technical Details
+
+- Built with Swift 5.9+ and SwiftUI
+- Uses NSPanel (non-activating) for overlay — never steals focus from Touch ID dialog
+- App monitoring via NSWorkspace notifications
+- Authentication via LocalAuthentication framework
+- Apple Watch via CoreBluetooth
+- Idle detection via IOKit
+- Dependencies: HotKey (SPM), Sparkle 2 (SPM)
+
+## Links
+
+- Homepage: https://dutkiewiczmaciej.github.io/MakLock/
+- GitHub: https://github.com/dutkiewiczmaciej/MakLock
+- Releases: https://github.com/dutkiewiczmaciej/MakLock/releases
+- Issues: https://github.com/dutkiewiczmaciej/MakLock/issues
