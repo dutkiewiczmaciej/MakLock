@@ -82,10 +82,22 @@ struct GeneralSettingsView: View {
                     .toggleStyle(.goldSwitch)
 
                 if settings.useExternalSSDCondition {
-                    Picker("Protected app", selection: selectedAppBundleBinding) {
-                        Text("Select app").tag("")
-                        ForEach(protectedAppsManager.apps.filter(\.isEnabled)) { app in
-                            Text(app.name).tag(app.bundleIdentifier)
+                    let enabledApps = protectedAppsManager.apps.filter(\.isEnabled)
+
+                    if enabledApps.isEmpty {
+                        Text("No enabled protected apps available. Add and enable apps in the Apps tab.")
+                            .font(MakLockTypography.caption)
+                            .foregroundColor(MakLockColors.textSecondary)
+                    } else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Protected apps")
+                                .font(MakLockTypography.caption)
+                                .foregroundColor(MakLockColors.textSecondary)
+
+                            ForEach(enabledApps) { app in
+                                Toggle(app.name, isOn: bindingForSsdConditionApp(app.bundleIdentifier))
+                                    .toggleStyle(.goldSwitch)
+                            }
                         }
                     }
 
@@ -112,7 +124,7 @@ struct GeneralSettingsView: View {
                         }
                     }
 
-                    Text("When enabled, MakLock ignores all other protected apps and only locks the selected app if the selected SSD is not connected.")
+                    Text("When enabled, selected apps are locked only if the selected SSD is not connected. Other protected apps continue using normal lock behavior.")
                         .font(MakLockTypography.caption)
                         .foregroundColor(MakLockColors.textSecondary)
                 }
@@ -144,15 +156,25 @@ struct GeneralSettingsView: View {
         .onChange(of: settings.lockOnIdle) { _ in save() }
         .onChange(of: settings.useExternalSSDCondition) { _ in save() }
         .onAppear {
+            migrateLegacySsdConditionSelectionIfNeeded()
             refreshExternalVolumes()
         }
     }
 
-    private var selectedAppBundleBinding: Binding<String> {
+    private func bindingForSsdConditionApp(_ bundleIdentifier: String) -> Binding<Bool> {
         Binding(
-            get: { settings.ssdConditionAppBundleIdentifier ?? "" },
-            set: { newValue in
-                settings.ssdConditionAppBundleIdentifier = newValue.isEmpty ? nil : newValue
+            get: {
+                settings.effectiveSsdConditionAppBundleIdentifiers.contains(bundleIdentifier)
+            },
+            set: { isSelected in
+                var selected = Set(settings.effectiveSsdConditionAppBundleIdentifiers)
+                if isSelected {
+                    selected.insert(bundleIdentifier)
+                } else {
+                    selected.remove(bundleIdentifier)
+                }
+                settings.ssdConditionAppBundleIdentifiers = Array(selected).sorted()
+                settings.ssdConditionAppBundleIdentifier = nil
                 save()
             }
         )
@@ -178,6 +200,18 @@ struct GeneralSettingsView: View {
 
     private func refreshExternalVolumes() {
         externalVolumes = ExternalDriveService.shared.listMountedExternalVolumes()
+    }
+
+    private func migrateLegacySsdConditionSelectionIfNeeded() {
+        guard settings.ssdConditionAppBundleIdentifiers.isEmpty,
+              let legacyBundleID = settings.ssdConditionAppBundleIdentifier,
+              !legacyBundleID.isEmpty else {
+            return
+        }
+
+        settings.ssdConditionAppBundleIdentifiers = [legacyBundleID]
+        settings.ssdConditionAppBundleIdentifier = nil
+        save()
     }
 
     private func save() {

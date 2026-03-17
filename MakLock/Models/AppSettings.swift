@@ -39,7 +39,11 @@ struct AppSettings: Codable {
     var useExternalSSDCondition: Bool = false
 
     /// Bundle identifier of the app controlled by the SSD condition.
+    /// Deprecated legacy single-app key kept for migration.
     var ssdConditionAppBundleIdentifier: String?
+
+    /// Bundle identifiers of apps controlled by the SSD condition.
+    var ssdConditionAppBundleIdentifiers: [String] = []
 
     /// UUID of the external SSD volume used as the lock condition.
     var ssdConditionVolumeUUID: String?
@@ -60,6 +64,7 @@ struct AppSettings: Codable {
         case launchAtLogin
         case useExternalSSDCondition
         case ssdConditionAppBundleIdentifier
+        case ssdConditionAppBundleIdentifiers
         case ssdConditionVolumeUUID
         case ssdConditionVolumeName
     }
@@ -80,7 +85,24 @@ struct AppSettings: Codable {
         launchAtLogin = try container.decodeIfPresent(Bool.self, forKey: .launchAtLogin) ?? false
         useExternalSSDCondition = try container.decodeIfPresent(Bool.self, forKey: .useExternalSSDCondition) ?? false
         ssdConditionAppBundleIdentifier = try container.decodeIfPresent(String.self, forKey: .ssdConditionAppBundleIdentifier)
+        ssdConditionAppBundleIdentifiers = try container.decodeIfPresent([String].self, forKey: .ssdConditionAppBundleIdentifiers) ?? []
+        if ssdConditionAppBundleIdentifiers.isEmpty,
+           let legacyBundleID = ssdConditionAppBundleIdentifier,
+           !legacyBundleID.isEmpty {
+            ssdConditionAppBundleIdentifiers = [legacyBundleID]
+        }
         ssdConditionVolumeUUID = try container.decodeIfPresent(String.self, forKey: .ssdConditionVolumeUUID)
         ssdConditionVolumeName = try container.decodeIfPresent(String.self, forKey: .ssdConditionVolumeName)
+    }
+
+    /// Effective SSD-conditioned app selection, including legacy fallback.
+    var effectiveSsdConditionAppBundleIdentifiers: [String] {
+        if !ssdConditionAppBundleIdentifiers.isEmpty {
+            return Array(Set(ssdConditionAppBundleIdentifiers))
+        }
+        if let legacyBundleID = ssdConditionAppBundleIdentifier, !legacyBundleID.isEmpty {
+            return [legacyBundleID]
+        }
+        return []
     }
 }

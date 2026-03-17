@@ -144,6 +144,12 @@ final class AppMonitorService: ObservableObject {
         authenticatedApps.remove(bundleIdentifier)
     }
 
+    /// Clear pending lock state for a specific app.
+    /// Used when user dismisses overlay without authenticating.
+    func clearPendingLock(for bundleIdentifier: String) {
+        pendingLockBundleIDs.remove(bundleIdentifier)
+    }
+
     /// Check if an app is currently authenticated.
     func isAuthenticated(_ bundleIdentifier: String) -> Bool {
         authenticatedApps.contains(bundleIdentifier)
@@ -155,14 +161,19 @@ final class AppMonitorService: ObservableObject {
         let settings = Defaults.shared.appSettings
         guard settings.useExternalSSDCondition else { return true }
 
-        guard let selectedAppBundleID = settings.ssdConditionAppBundleIdentifier,
-              !selectedAppBundleID.isEmpty,
-              let selectedVolumeUUID = settings.ssdConditionVolumeUUID,
-              !selectedVolumeUUID.isEmpty else {
-            return false
+                let selectedAppBundleIDs = Set(settings.effectiveSsdConditionAppBundleIdentifiers)
+                guard !selectedAppBundleIDs.isEmpty else {
+                        return true
         }
 
-        guard bundleIdentifier == selectedAppBundleID else { return false }
+                // SSD condition is per-app. Non-selected protected apps use default locking.
+                guard selectedAppBundleIDs.contains(bundleIdentifier) else { return true }
+
+                // If selected apps have no SSD configured yet, keep default locking behavior.
+                guard let selectedVolumeUUID = settings.ssdConditionVolumeUUID,
+                            !selectedVolumeUUID.isEmpty else {
+                        return true
+                }
 
         let isSelectedVolumeConnected = ExternalDriveService.shared.isVolumeConnected(uuid: selectedVolumeUUID)
         return !isSelectedVolumeConnected

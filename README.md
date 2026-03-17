@@ -121,7 +121,7 @@ Build and run with `Cmd+R`. Requires Xcode 15+ and macOS 13+.
 
 ## Conditional Locking with External SSD
 
-MakLock can lock one specific protected app only when a specific external SSD is disconnected.
+MakLock can lock selected protected apps only when a specific external SSD is disconnected.
 
 This is useful when an app depends on data that lives on removable storage and should only be opened when that drive is present.
 
@@ -130,15 +130,15 @@ This is useful when an app depends on data that lives on removable storage and s
 1. Add your app in the **Apps** tab (for example, Photos).
 2. Open **Settings -> General -> External SSD Condition**.
 3. Enable **Only lock selected app when selected SSD is disconnected**.
-4. Select the protected app.
+4. Select one or more protected apps.
 5. Select the external SSD from the drive picker.
 6. Optionally click **Refresh Drives** after plugging in a drive.
 
 ### Behavior
 
-- If the selected SSD is connected: MakLock does not lock the selected app.
-- If the selected SSD is disconnected: MakLock locks the selected app and requires authentication.
-- While this mode is enabled, MakLock ignores other protected apps and applies locking only to the selected app.
+- If the selected SSD is connected: MakLock does not lock selected apps.
+- If the selected SSD is disconnected: MakLock locks selected apps and requires authentication.
+- Other protected apps continue to use normal lock behavior.
 
 ### Example Use Case
 
