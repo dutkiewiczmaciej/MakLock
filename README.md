@@ -60,6 +60,7 @@ AppLocker (App Store) is sandboxed — it can only intercept app launches, not a
 - [x] Conditional lock based on external SSD connection
 - [x] Menu bar app (no Dock icon, runs silently)
 - [x] Panic key emergency exit (`Cmd+Opt+Shift+Ctrl+U`)
+- [x] Go Back action on lock screen (dismiss without unlocking)
 - [x] System app blacklist (Terminal, Xcode, etc. can never be locked)
 - [x] Multi-monitor support
 - [x] First launch onboarding
@@ -171,6 +172,7 @@ MakLock/
 MakLock includes multiple safety mechanisms to ensure you never get locked out:
 
 - **Panic key** — `Cmd+Option+Shift+Control+U` instantly dismisses all overlays
+- **Go Back on lock screen** — dismisses the overlay without unlocking, hides the accidental app launch, and returns you to Finder
 - **System blacklist** — Terminal, Xcode, Activity Monitor, and other critical apps can never be locked
 - **Timeout failsafe** — overlays auto-dismiss after 60 seconds without interaction
 - **Dev mode** — DEBUG builds include a Skip button and 10-second auto-dismiss
