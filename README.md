@@ -57,6 +57,7 @@ AppLocker (App Store) is sandboxed — it can only intercept app launches, not a
 - [x] Auto-lock on sleep/wake
 - [x] Auto-close inactive apps (prevents notification snooping)
 - [x] Close protected apps on sleep (privacy on shared laptops)
+- [x] Conditional lock based on external SSD connection
 - [x] Menu bar app (no Dock icon, runs silently)
 - [x] Panic key emergency exit (`Cmd+Opt+Shift+Ctrl+U`)
 - [x] System app blacklist (Terminal, Xcode, etc. can never be locked)
@@ -117,6 +118,38 @@ Build and run with `Cmd+R`. Requires Xcode 15+ and macOS 13+.
 4. **Re-lock on quit** — Cmd+Q clears authentication, so the next launch requires re-auth (even for apps that stay alive in background like Messages)
 5. **Auto-lock** — re-locks on idle timeout, sleep, or when Apple Watch leaves range
 6. **Auto-close** — optionally terminates inactive protected apps to prevent notification snooping
+
+## Conditional Locking with External SSD
+
+MakLock can lock one specific protected app only when a specific external SSD is disconnected.
+
+This is useful when an app depends on data that lives on removable storage and should only be opened when that drive is present.
+
+### Setup
+
+1. Add your app in the **Apps** tab (for example, Photos).
+2. Open **Settings -> General -> External SSD Condition**.
+3. Enable **Only lock selected app when selected SSD is disconnected**.
+4. Select the protected app.
+5. Select the external SSD from the drive picker.
+6. Optionally click **Refresh Drives** after plugging in a drive.
+
+### Behavior
+
+- If the selected SSD is connected: MakLock does not lock the selected app.
+- If the selected SSD is disconnected: MakLock locks the selected app and requires authentication.
+- While this mode is enabled, MakLock ignores other protected apps and applies locking only to the selected app.
+
+### Example Use Case
+
+If your iCloud Photos library is stored on an external SSD, you may only want the Photos app to open when that SSD is mounted.
+
+Configure MakLock to:
+
+- Selected app: **Photos**
+- Selected SSD: your Photos library drive
+
+Now, if the drive is unplugged, Photos will be locked until you authenticate. When the drive is mounted again, MakLock will stop locking Photos under this condition.
 
 ## Architecture
 

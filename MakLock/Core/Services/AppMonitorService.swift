@@ -109,6 +109,7 @@ final class AppMonitorService: ObservableObject {
                 guard !authenticatedApps.contains(bundleID) else { continue }
                 guard !pendingLockBundleIDs.contains(bundleID) else { continue }
                 guard !OverlayWindowService.shared.isShowing else { continue }
+                guard shouldLockAppUnderCurrentConditions(bundleID) else { continue }
 
                 NSLog("[MakLock] Found running protected app: %@ (%@)", protectedApp.name, bundleID)
                 detectedApp = protectedApp
@@ -148,6 +149,25 @@ final class AppMonitorService: ObservableObject {
         authenticatedApps.contains(bundleIdentifier)
     }
 
+    /// Returns whether lock logic should currently apply to this app.
+    /// This enforces optional "lock only when selected SSD is disconnected" behavior.
+    func shouldLockAppUnderCurrentConditions(_ bundleIdentifier: String) -> Bool {
+        let settings = Defaults.shared.appSettings
+        guard settings.useExternalSSDCondition else { return true }
+
+        guard let selectedAppBundleID = settings.ssdConditionAppBundleIdentifier,
+              !selectedAppBundleID.isEmpty,
+              let selectedVolumeUUID = settings.ssdConditionVolumeUUID,
+              !selectedVolumeUUID.isEmpty else {
+            return false
+        }
+
+        guard bundleIdentifier == selectedAppBundleID else { return false }
+
+        let isSelectedVolumeConnected = ExternalDriveService.shared.isVolumeConnected(uuid: selectedVolumeUUID)
+        return !isSelectedVolumeConnected
+    }
+
     /// Check if an app has any normal-level windows (layer 0).
     /// Returns false when an app was Cmd+Q'd but its process stayed alive.
     private func appHasWindows(_ app: NSRunningApplication) -> Bool {
@@ -182,6 +202,9 @@ final class AppMonitorService: ObservableObject {
         // Check if global protection is enabled
         let settings = Defaults.shared.appSettings
         guard settings.isProtectionEnabled else { return }
+
+        // Apply optional external SSD condition gating.
+        guard shouldLockAppUnderCurrentConditions(bundleID) else { return }
 
         // Skip if app is already authenticated in this session
         guard !authenticatedApps.contains(bundleID) else { return }

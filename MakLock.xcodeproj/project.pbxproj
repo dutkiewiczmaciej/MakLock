@@ -47,6 +47,7 @@
 		A10000000000000000000A01 /* IdleMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000A11 /* IdleMonitorService.swift */; };
 		A10000000000000000000B01 /* SleepWakeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000B11 /* SleepWakeService.swift */; };
 		A10000000000000000000C01 /* WatchProximityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000C11 /* WatchProximityService.swift */; };
+		A10000000000000000001301 /* ExternalDriveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000001311 /* ExternalDriveService.swift */; };
 		A10000000000000000000D01 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000D11 /* OnboardingView.swift */; };
 		A10000000000000000000D02 /* OnboardingWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000D12 /* OnboardingWindow.swift */; };
 		A10000000000000000000E01 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000E11 /* AboutView.swift */; };
@@ -100,6 +101,7 @@
 		A10000000000000000000A11 /* IdleMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleMonitorService.swift; sourceTree = "<group>"; };
 		A10000000000000000000B11 /* SleepWakeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepWakeService.swift; sourceTree = "<group>"; };
 		A10000000000000000000C11 /* WatchProximityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchProximityService.swift; sourceTree = "<group>"; };
+		A10000000000000000001311 /* ExternalDriveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDriveService.swift; sourceTree = "<group>"; };
 		A10000000000000000000D11 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		A10000000000000000000D12 /* OnboardingWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingWindow.swift; sourceTree = "<group>"; };
 		A10000000000000000000E11 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 			isa = PBXGroup;
 			children = (
 				A10000000000000000000611 /* AppMonitorService.swift */,
+				A10000000000000000001311 /* ExternalDriveService.swift */,
 				A10000000000000000000813 /* OverlayWindowService.swift */,
 				A10000000000000000000911 /* AuthenticationService.swift */,
 				A10000000000000000000A11 /* IdleMonitorService.swift */,
@@ -425,6 +428,7 @@
 				A10000000000000000000A01 /* IdleMonitorService.swift in Sources */,
 				A10000000000000000000B01 /* SleepWakeService.swift in Sources */,
 				A10000000000000000000C01 /* WatchProximityService.swift in Sources */,
+				A10000000000000000001301 /* ExternalDriveService.swift in Sources */,
 				A10000000000000000000D01 /* OnboardingView.swift in Sources */,
 				A10000000000000000000D02 /* OnboardingWindow.swift in Sources */,
 				A10000000000000000000E01 /* AboutView.swift in Sources */,

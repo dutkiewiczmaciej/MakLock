@@ -126,6 +126,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         var showedOverlay = false
         for app in apps {
+            guard AppMonitorService.shared.shouldLockAppUnderCurrentConditions(app.bundleIdentifier) else {
+                continue
+            }
+
             if app.autoClose && !SafetyManager.isBlacklisted(app.bundleIdentifier) {
                 if let running = NSWorkspace.shared.runningApplications.first(where: {
                     $0.bundleIdentifier == app.bundleIdentifier
