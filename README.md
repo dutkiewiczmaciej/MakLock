@@ -57,8 +57,10 @@ AppLocker (App Store) is sandboxed — it can only intercept app launches, not a
 - [x] Auto-lock on sleep/wake
 - [x] Auto-close inactive apps (prevents notification snooping)
 - [x] Close protected apps on sleep (privacy on shared laptops)
+- [x] Conditional lock based on external SSD connection
 - [x] Menu bar app (no Dock icon, runs silently)
 - [x] Panic key emergency exit (`Cmd+Opt+Shift+Ctrl+U`)
+- [x] Go Back action on lock screen (dismiss without unlocking)
 - [x] System app blacklist (Terminal, Xcode, etc. can never be locked)
 - [x] Multi-monitor support
 - [x] First launch onboarding
@@ -118,6 +120,38 @@ Build and run with `Cmd+R`. Requires Xcode 15+ and macOS 13+.
 5. **Auto-lock** — re-locks on idle timeout, sleep, or when Apple Watch leaves range
 6. **Auto-close** — optionally terminates inactive protected apps to prevent notification snooping
 
+## Conditional Locking with External SSD
+
+MakLock can lock selected protected apps only when a specific external SSD is disconnected.
+
+This is useful when an app depends on data that lives on removable storage and should only be opened when that drive is present.
+
+### Setup
+
+1. Add your app in the **Apps** tab (for example, Photos).
+2. Open **Settings -> General -> External SSD Condition**.
+3. Enable **Only lock selected app when selected SSD is disconnected**.
+4. Select one or more protected apps.
+5. Select the external SSD from the drive picker.
+6. Optionally click **Refresh Drives** after plugging in a drive.
+
+### Behavior
+
+- If the selected SSD is connected: MakLock does not lock selected apps.
+- If the selected SSD is disconnected: MakLock locks selected apps and requires authentication.
+- Other protected apps continue to use normal lock behavior.
+
+### Example Use Case
+
+If your iCloud Photos library is stored on an external SSD, you may only want the Photos app to open when that SSD is mounted.
+
+Configure MakLock to:
+
+- Selected app: **Photos**
+- Selected SSD: your Photos library drive
+
+Now, if the drive is unplugged, Photos will be locked until you authenticate. When the drive is mounted again, MakLock will stop locking Photos under this condition.
+
 ## Architecture
 
 MakLock is a native Swift/SwiftUI application distributed outside the App Store for full system access.
@@ -138,6 +172,7 @@ MakLock/
 MakLock includes multiple safety mechanisms to ensure you never get locked out:
 
 - **Panic key** — `Cmd+Option+Shift+Control+U` instantly dismisses all overlays
+- **Go Back on lock screen** — dismisses the overlay without unlocking, hides the accidental app launch, and returns you to Finder
 - **System blacklist** — Terminal, Xcode, Activity Monitor, and other critical apps can never be locked
 - **Timeout failsafe** — overlays auto-dismiss after 60 seconds without interaction
 - **Dev mode** — DEBUG builds include a Skip button and 10-second auto-dismiss

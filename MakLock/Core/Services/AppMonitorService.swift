@@ -109,6 +109,7 @@ final class AppMonitorService: ObservableObject {
                 guard !authenticatedApps.contains(bundleID) else { continue }
                 guard !pendingLockBundleIDs.contains(bundleID) else { continue }
                 guard !OverlayWindowService.shared.isShowing else { continue }
+                guard shouldLockAppUnderCurrentConditions(bundleID) else { continue }
 
                 NSLog("[MakLock] Found running protected app: %@ (%@)", protectedApp.name, bundleID)
                 detectedApp = protectedApp
@@ -143,9 +144,39 @@ final class AppMonitorService: ObservableObject {
         authenticatedApps.remove(bundleIdentifier)
     }
 
+    /// Clear pending lock state for a specific app.
+    /// Used when user dismisses overlay without authenticating.
+    func clearPendingLock(for bundleIdentifier: String) {
+        pendingLockBundleIDs.remove(bundleIdentifier)
+    }
+
     /// Check if an app is currently authenticated.
     func isAuthenticated(_ bundleIdentifier: String) -> Bool {
         authenticatedApps.contains(bundleIdentifier)
+    }
+
+    /// Returns whether lock logic should currently apply to this app.
+    /// This enforces optional "lock only when selected SSD is disconnected" behavior.
+    func shouldLockAppUnderCurrentConditions(_ bundleIdentifier: String) -> Bool {
+        let settings = Defaults.shared.appSettings
+        guard settings.useExternalSSDCondition else { return true }
+
+                let selectedAppBundleIDs = Set(settings.effectiveSsdConditionAppBundleIdentifiers)
+                guard !selectedAppBundleIDs.isEmpty else {
+                        return true
+        }
+
+                // SSD condition is per-app. Non-selected protected apps use default locking.
+                guard selectedAppBundleIDs.contains(bundleIdentifier) else { return true }
+
+                // If selected apps have no SSD configured yet, keep default locking behavior.
+                guard let selectedVolumeUUID = settings.ssdConditionVolumeUUID,
+                            !selectedVolumeUUID.isEmpty else {
+                        return true
+                }
+
+        let isSelectedVolumeConnected = ExternalDriveService.shared.isVolumeConnected(uuid: selectedVolumeUUID)
+        return !isSelectedVolumeConnected
     }
 
     /// Check if an app has any normal-level windows (layer 0).
@@ -182,6 +213,9 @@ final class AppMonitorService: ObservableObject {
         // Check if global protection is enabled
         let settings = Defaults.shared.appSettings
         guard settings.isProtectionEnabled else { return }
+
+        // Apply optional external SSD condition gating.
+        guard shouldLockAppUnderCurrentConditions(bundleID) else { return }
 
         // Skip if app is already authenticated in this session
         guard !authenticatedApps.contains(bundleID) else { return }
