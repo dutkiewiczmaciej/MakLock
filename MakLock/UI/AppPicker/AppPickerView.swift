@@ -102,7 +102,7 @@ struct AppPickerView: View {
 
     private func loadInstalledApps() {
         let fileManager = FileManager.default
-        let appDirs = ["/Applications", "/System/Applications"]
+        let appDirs = ["/Applications", "/System/Applications", FileManager.default.homeDirectoryForCurrentUser.path() + "/Applications"]
         var apps: [AppInfo] = []
 
         let alreadyProtected = Set(Defaults.shared.protectedApps.map(\.bundleIdentifier))
