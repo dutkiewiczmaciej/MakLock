@@ -7,6 +7,7 @@ struct LockOverlayView: View {
     let bundleIdentifier: String
     let isPrimary: Bool
     let onDismiss: () -> Void
+    let onGoBack: () -> Void
 
     @State private var isVisible = false
     @State private var showPasswordInput = false
@@ -34,7 +35,7 @@ struct LockOverlayView: View {
                         onDismiss()
                     },
                     onCancel: {
-                        showPasswordInput = false
+                        onGoBack()
                     }
                 )
                 .transition(.opacity)
@@ -78,6 +79,12 @@ struct LockOverlayView: View {
                             }
                         }
                     }
+
+                    Button("Go Back") {
+                        onGoBack()
+                    }
+                    .font(MakLockTypography.caption)
+                    .foregroundColor(MakLockColors.textSecondary)
 
                     // Dev mode skip button
                     #if DEBUG

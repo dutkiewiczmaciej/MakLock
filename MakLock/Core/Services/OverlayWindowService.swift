@@ -13,6 +13,9 @@ final class OverlayWindowService {
     /// Passes the name of the unlocked app.
     var onUnlocked: ((String) -> Void)?
 
+    /// Callback when overlay is dismissed without unlocking (user chose Go Back).
+    var onCancelled: (() -> Void)?
+
     private init() {
         // Observe screen configuration changes (connect/disconnect monitors)
         NotificationCenter.default.addObserver(
@@ -71,6 +74,29 @@ final class OverlayWindowService {
     /// Dismiss all overlays (used by panic key).
     func dismissAll() {
         hide()
+    }
+
+    /// Dismiss overlay without authenticating and return user away from the locked app.
+    func cancelAndReturn() {
+        stopTimeoutTimer()
+
+        // Cancel any in-progress Touch ID evaluation
+        AuthenticationService.shared.cancelAuthentication()
+
+        let bundleID = currentApp?.bundleIdentifier
+
+        overlayWindows.forEach { $0.close() }
+        overlayWindows.removeAll()
+        currentApp = nil
+
+        if let bundleID {
+            AppMonitorService.shared.clearPendingLock(for: bundleID)
+            hideRunningApp(bundleIdentifier: bundleID)
+        }
+
+        activateFinder()
+        onCancelled?()
+        NSLog("[MakLock] Overlay dismissed via Go Back")
     }
 
     /// Whether an overlay is currently displayed.
@@ -137,6 +163,9 @@ final class OverlayWindowService {
                         let name = self?.currentApp?.name ?? "app"
                         self?.hide()
                         self?.onUnlocked?(name)
+                    },
+                    onGoBack: { [weak self] in
+                        self?.cancelAndReturn()
                     }
                 )
                 window.contentView = NSHostingView(rootView: overlayView)
@@ -163,6 +192,9 @@ final class OverlayWindowService {
                     let name = self?.currentApp?.name ?? "app"
                     self?.hide()
                     self?.onUnlocked?(name)
+                },
+                onGoBack: { [weak self] in
+                    self?.cancelAndReturn()
                 }
             )
 
@@ -184,6 +216,24 @@ final class OverlayWindowService {
         }
         app.activate()
         NSLog("[MakLock] Activated app: %@", bundleIdentifier)
+    }
+
+    private func hideRunningApp(bundleIdentifier: String) {
+        guard let app = NSWorkspace.shared.runningApplications.first(where: { $0.bundleIdentifier == bundleIdentifier }) else {
+            return
+        }
+        app.hide()
+    }
+
+    private func activateFinder() {
+        if let finder = NSWorkspace.shared.runningApplications.first(where: {
+            $0.bundleIdentifier == "com.apple.finder"
+        }) {
+            finder.activate()
+            return
+        }
+
+        NSWorkspace.shared.open(URL(fileURLWithPath: NSHomeDirectory()))
     }
 
     // MARK: - Timeout

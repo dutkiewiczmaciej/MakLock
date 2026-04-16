@@ -4,6 +4,8 @@ import ServiceManagement
 /// General settings tab: launch at login, idle auto-lock, sleep auto-lock.
 struct GeneralSettingsView: View {
     @State private var settings = Defaults.shared.appSettings
+    @StateObject private var protectedAppsManager = ProtectedAppsManager.shared
+    @State private var externalVolumes: [ExternalVolume] = []
     private let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
     private let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
 
@@ -75,6 +77,59 @@ struct GeneralSettingsView: View {
                     .foregroundColor(MakLockColors.textSecondary)
             }
 
+            Section("External SSD Condition") {
+                Toggle("Only lock selected app when selected SSD is disconnected", isOn: $settings.useExternalSSDCondition)
+                    .toggleStyle(.goldSwitch)
+
+                if settings.useExternalSSDCondition {
+                    let enabledApps = protectedAppsManager.apps.filter(\.isEnabled)
+
+                    if enabledApps.isEmpty {
+                        Text("No enabled protected apps available. Add and enable apps in the Apps tab.")
+                            .font(MakLockTypography.caption)
+                            .foregroundColor(MakLockColors.textSecondary)
+                    } else {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Protected apps")
+                                .font(MakLockTypography.caption)
+                                .foregroundColor(MakLockColors.textSecondary)
+
+                            ForEach(enabledApps) { app in
+                                Toggle(app.name, isOn: bindingForSsdConditionApp(app.bundleIdentifier))
+                                    .toggleStyle(.goldSwitch)
+                            }
+                        }
+                    }
+
+                    Picker("External SSD", selection: selectedVolumeUUIDBinding) {
+                        Text("Select SSD").tag("")
+                        ForEach(externalVolumes) { volume in
+                            Text(volume.name).tag(volume.uuid)
+                        }
+                    }
+
+                    HStack {
+                        Button("Refresh Drives") {
+                            refreshExternalVolumes()
+                        }
+
+                        Spacer()
+
+                        if let stateText = selectedVolumeConnectionStateText {
+                            Text(stateText)
+                                .font(MakLockTypography.caption)
+                                .foregroundColor(
+                                    stateText == "Connected" ? MakLockColors.success : MakLockColors.locked
+                                )
+                        }
+                    }
+
+                    Text("When enabled, selected apps are locked only if the selected SSD is not connected. Other protected apps continue using normal lock behavior.")
+                        .font(MakLockTypography.caption)
+                        .foregroundColor(MakLockColors.textSecondary)
+                }
+            }
+
             Section {
                 Button("Check for Updates…") {
                     UpdateService.shared.updater.checkForUpdates()
@@ -99,6 +154,64 @@ struct GeneralSettingsView: View {
         .onChange(of: settings.launchAtLogin) { _ in save() }
         .onChange(of: settings.lockOnSleep) { _ in save() }
         .onChange(of: settings.lockOnIdle) { _ in save() }
+        .onChange(of: settings.useExternalSSDCondition) { _ in save() }
+        .onAppear {
+            migrateLegacySsdConditionSelectionIfNeeded()
+            refreshExternalVolumes()
+        }
+    }
+
+    private func bindingForSsdConditionApp(_ bundleIdentifier: String) -> Binding<Bool> {
+        Binding(
+            get: {
+                settings.effectiveSsdConditionAppBundleIdentifiers.contains(bundleIdentifier)
+            },
+            set: { isSelected in
+                var selected = Set(settings.effectiveSsdConditionAppBundleIdentifiers)
+                if isSelected {
+                    selected.insert(bundleIdentifier)
+                } else {
+                    selected.remove(bundleIdentifier)
+                }
+                settings.ssdConditionAppBundleIdentifiers = Array(selected).sorted()
+                settings.ssdConditionAppBundleIdentifier = nil
+                save()
+            }
+        )
+    }
+
+    private var selectedVolumeUUIDBinding: Binding<String> {
+        Binding(
+            get: { settings.ssdConditionVolumeUUID ?? "" },
+            set: { newValue in
+                settings.ssdConditionVolumeUUID = newValue.isEmpty ? nil : newValue
+                settings.ssdConditionVolumeName = externalVolumes.first(where: {
+                    $0.uuid == newValue
+                })?.name
+                save()
+            }
+        )
+    }
+
+    private var selectedVolumeConnectionStateText: String? {
+        guard let uuid = settings.ssdConditionVolumeUUID, !uuid.isEmpty else { return nil }
+        return ExternalDriveService.shared.isVolumeConnected(uuid: uuid) ? "Connected" : "Disconnected"
+    }
+
+    private func refreshExternalVolumes() {
+        externalVolumes = ExternalDriveService.shared.listMountedExternalVolumes()
+    }
+
+    private func migrateLegacySsdConditionSelectionIfNeeded() {
+        guard settings.ssdConditionAppBundleIdentifiers.isEmpty,
+              let legacyBundleID = settings.ssdConditionAppBundleIdentifier,
+              !legacyBundleID.isEmpty else {
+            return
+        }
+
+        settings.ssdConditionAppBundleIdentifiers = [legacyBundleID]
+        settings.ssdConditionAppBundleIdentifier = nil
+        save()
     }
 
     private func save() {
