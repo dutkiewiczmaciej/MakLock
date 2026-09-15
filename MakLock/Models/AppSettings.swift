@@ -32,4 +32,7 @@ struct AppSettings: Codable {
 
     /// Launch MakLock at login.
     var launchAtLogin: Bool = false
+
+    /// Whether the lock overlay should be fullscreen. If false, it will be a smaller modal window.
+    var isFullScreenOverlay: Bool = false
 }

@@ -56,6 +56,8 @@ struct PasswordInputView: View {
             password = ""
             triggerShake()
         case .cancelled:
+            onCancel()
+        case .userFallback:
             break
         }
     }

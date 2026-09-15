@@ -15,6 +15,9 @@ struct GeneralSettingsView: View {
 
                 Toggle("Lock apps when Mac sleeps", isOn: $settings.lockOnSleep)
                     .toggleStyle(.goldSwitch)
+
+                Toggle("Full screen lock overlay", isOn: $settings.isFullScreenOverlay)
+                    .toggleStyle(.goldSwitch)
             }
 
             Section {
@@ -99,6 +102,7 @@ struct GeneralSettingsView: View {
         .onChange(of: settings.launchAtLogin) { _ in save() }
         .onChange(of: settings.lockOnSleep) { _ in save() }
         .onChange(of: settings.lockOnIdle) { _ in save() }
+        .onChange(of: settings.isFullScreenOverlay) { _ in save() }
     }
 
     private func save() {
