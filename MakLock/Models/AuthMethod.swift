@@ -14,6 +14,7 @@ enum AuthResult {
     case success
     case failure(AuthError)
     case cancelled
+    case userFallback
 }
 
 /// Authentication errors.

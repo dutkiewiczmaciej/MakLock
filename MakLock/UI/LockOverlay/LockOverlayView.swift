@@ -88,6 +88,23 @@ struct LockOverlayView: View {
                     .foregroundColor(MakLockColors.error)
                     .padding(.top, 8)
                     #endif
+                    
+                    VStack(spacing: 8) {
+                        Button("Close App") {
+                            OverlayWindowService.shared.quitCurrentApp()
+                        }
+                        .keyboardShortcut("q", modifiers: [.command, .option])
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 6)
+                        .background(Color.white.opacity(0.1))
+                        .cornerRadius(6)
+                        
+                        Text("Press Option (⌥) + Command (⌘) + Q to close")
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 12)
                 }
                 .padding(40)
                 .background(
@@ -134,6 +151,17 @@ struct LockOverlayView: View {
                 errorMessage = error.localizedDescription
             case .cancelled:
                 authState = .waitingForUser
+            case .userFallback:
+                authState = .waitingForUser
+                // Delay slightly to let the system Touch ID dialog fully dismiss
+                // before we make our window key and insert a SecureField.
+                // Doing this synchronously can cause an AppKit focus exception.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    OverlayWindowService.shared.enableKeyboardInput()
+                    withAnimation(MakLockAnimations.standard) {
+                        showPasswordInput = true
+                    }
+                }
             }
         }
     }

@@ -40,8 +40,15 @@ final class AuthenticationService {
 
                 if success {
                     completion(.success)
-                } else if let error = error as? LAError, error.code == .userCancel {
-                    completion(.cancelled)
+                } else if let error = error as? LAError {
+                    if error.code == .userCancel {
+                        completion(.cancelled)
+                    } else if error.code == .userFallback {
+                        completion(.userFallback)
+                    } else {
+                        let authError = self.mapLAError(error as NSError?)
+                        completion(.failure(authError))
+                    }
                 } else {
                     let authError = self.mapLAError(error as NSError?)
                     completion(.failure(authError))

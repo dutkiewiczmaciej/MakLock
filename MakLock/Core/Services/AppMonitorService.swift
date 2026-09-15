@@ -130,6 +130,11 @@ final class AppMonitorService: ObservableObject {
         pendingLockBundleIDs.remove(bundleIdentifier)
         NSLog("[MakLock] App session authenticated: %@", bundleIdentifier)
     }
+    
+    /// Cancel a pending lock for an app (e.g. if the user dismisses the prompt without unlocking).
+    func cancelPendingLock(for bundleIdentifier: String) {
+        pendingLockBundleIDs.remove(bundleIdentifier)
+    }
 
     /// Clear all authentication sessions (called on idle timeout, sleep, Watch out of range).
     func clearAllAuthentications() {

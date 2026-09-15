@@ -59,7 +59,7 @@ final class SettingsAuthService {
             switch result {
             case .success:
                 completion(true)
-            case .failure, .cancelled:
+            case .failure, .cancelled, .userFallback:
                 completion(false)
             }
         }
