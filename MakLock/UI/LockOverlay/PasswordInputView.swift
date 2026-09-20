@@ -52,6 +52,7 @@ struct PasswordInputView: View {
         case .success:
             onSuccess()
         case .failure(let error):
+            AccessLog.record("Wrong password entered at the lock screen")
             errorMessage = error.localizedDescription
             password = ""
             triggerShake()

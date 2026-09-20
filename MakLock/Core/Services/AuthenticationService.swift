@@ -11,13 +11,22 @@ final class AuthenticationService {
     /// The active LAContext — kept so it can be cancelled on overlay dismiss.
     private var activeContext: LAContext?
 
+    /// A Touch ID request that arrived while another prompt was showing
+    /// (e.g. the lock overlay appearing while the Settings prompt is up).
+    /// It starts as soon as the current prompt finishes.
+    private var queuedRequest: (() -> Void)?
+
     private init() {}
 
     /// Attempt Touch ID authentication.
-    /// Concurrent calls are silently ignored — only one evaluatePolicy at a time.
-    func authenticateWithTouchID(reason: String = "Unlock this app", completion: @escaping (AuthResult) -> Void) {
+    /// Only one evaluatePolicy runs at a time; a concurrent call is queued and
+    /// started when the current one finishes, so its completion always fires.
+    func authenticateWithTouchID(reason: String = String(localized: "Unlock this app"), completion: @escaping (AuthResult) -> Void) {
         guard !isAuthenticating else {
-            NSLog("[MakLock] Touch ID already in progress — ignoring duplicate call")
+            NSLog("[MakLock] Touch ID already in progress — queuing request")
+            queuedRequest = { [weak self] in
+                self?.authenticateWithTouchID(reason: reason, completion: completion)
+            }
             return
         }
 
@@ -37,6 +46,7 @@ final class AuthenticationService {
             DispatchQueue.main.async {
                 self.isAuthenticating = false
                 self.activeContext = nil
+                defer { self.startQueuedRequest() }
 
                 if success {
                     completion(.success)
@@ -52,9 +62,16 @@ final class AuthenticationService {
 
     /// Cancel any in-progress Touch ID evaluation (called when overlay is dismissed externally).
     func cancelAuthentication() {
+        queuedRequest = nil
         activeContext?.invalidate()
         activeContext = nil
         isAuthenticating = false
+    }
+
+    private func startQueuedRequest() {
+        guard let request = queuedRequest else { return }
+        queuedRequest = nil
+        request()
     }
 
     /// Verify the backup password.
@@ -93,6 +110,7 @@ final class AuthenticationService {
             DispatchQueue.main.async {
                 self.isAuthenticating = false
                 self.activeContext = nil
+                defer { self.startQueuedRequest() }
 
                 if success {
                     completion(.success)

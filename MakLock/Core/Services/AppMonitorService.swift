@@ -143,6 +143,12 @@ final class AppMonitorService: ObservableObject {
         authenticatedApps.remove(bundleIdentifier)
     }
 
+    /// Forget a pending lock prompt that was dismissed without authentication,
+    /// so the next launch or activation of the app shows the overlay again.
+    func clearPendingLock(for bundleIdentifier: String) {
+        pendingLockBundleIDs.remove(bundleIdentifier)
+    }
+
     /// Check if an app is currently authenticated.
     func isAuthenticated(_ bundleIdentifier: String) -> Bool {
         authenticatedApps.contains(bundleIdentifier)

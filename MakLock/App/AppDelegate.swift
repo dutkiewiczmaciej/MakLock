@@ -50,6 +50,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Self.sendUnlockNotification(appName: appName)
         }
 
+        // Overlay dismissed without authentication — app stays locked
+        OverlayWindowService.shared.onAccessDenied = { [weak self] appName in
+            self?.menuBarController.iconState = .active
+            Self.sendNotification(title: "Access Denied", body: "Someone tried to open \(appName) without unlocking it")
+        }
+
         // Start Watch proximity BEFORE app monitoring so Watch has time to connect.
         // This prevents false overlay triggers on app restart.
         if Defaults.shared.appSettings.useWatchUnlock {
