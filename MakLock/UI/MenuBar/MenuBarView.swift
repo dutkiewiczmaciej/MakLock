@@ -31,7 +31,7 @@ struct MenuBarView: View {
                 Circle()
                     .fill(isProtectionEnabled ? MakLockColors.success : MakLockColors.textSecondary)
                     .frame(width: 8, height: 8)
-                Text(isProtectionEnabled ? "Protection Active" : "Protection Off")
+                Text(LocalizedStringKey(isProtectionEnabled ? "Protection Active" : "Protection Off"))
                     .font(MakLockTypography.body)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -51,7 +51,7 @@ struct MenuBarView: View {
                 Image(systemName: "app.badge.checkmark")
                     .font(.system(size: 11))
                     .foregroundColor(.secondary)
-                Text("\(appCount) protected app\(appCount == 1 ? "" : "s")")
+                Text(appCount == 1 ? String(localized: "1 protected app") : String(localized: "\(appCount) protected apps"))
                     .font(MakLockTypography.caption)
                     .foregroundColor(.secondary)
             }
@@ -90,7 +90,7 @@ struct MenuBarView: View {
             backing: .buffered,
             defer: false
         )
-        window.title = "About MakLock"
+        window.title = String(localized: "About MakLock")
         window.contentView = NSHostingView(rootView: AboutView())
         window.isReleasedWhenClosed = true
         window.center()
@@ -114,7 +114,7 @@ private struct MenuBarButton: View {
                 Image(systemName: icon)
                     .font(.system(size: 12))
                     .frame(width: 16)
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(MakLockTypography.body)
                 Spacer()
             }

@@ -10,6 +10,8 @@
 		3C36B23C6F719E84D10ECE91 /* AppInactivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8AAF1355AD0ACA8137F01D /* AppInactivityService.swift */; };
 		A10000000000000000000001 /* MakLockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* MakLockApp.swift */; };
 		A10000000000000000000002 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* Assets.xcassets */; };
+		A1000000000000000000D001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000D011 /* Localizable.strings */; };
+		A1000000000000000000D002 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1000000000000000000D012 /* InfoPlist.strings */; };
 		A10000000000000000000101 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000111 /* Colors.swift */; };
 		A10000000000000000000102 /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000112 /* Typography.swift */; };
 		A10000000000000000000103 /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000113 /* Animations.swift */; };
@@ -62,6 +64,10 @@
 		A10000000000000000000011 /* MakLockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakLockApp.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1000000000000000000D021 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A1000000000000000000D022 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A1000000000000000000D023 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A1000000000000000000D024 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A10000000000000000000014 /* MakLock.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MakLock.entitlements; sourceTree = "<group>"; };
 		A10000000000000000000111 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		A10000000000000000000112 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
@@ -155,6 +161,8 @@
 				A10000000000000000000012 /* Assets.xcassets */,
 				A10000000000000000000013 /* Info.plist */,
 				A10000000000000000000014 /* MakLock.entitlements */,
+				A1000000000000000000D011 /* Localizable.strings */,
+				A1000000000000000000D012 /* InfoPlist.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -356,6 +364,7 @@
 			knownRegions = (
 				en,
 				Base,
+				da,
 			);
 			mainGroup = A10000000000000000000030;
 			packageReferences = (
@@ -377,6 +386,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000002 /* Assets.xcassets in Resources */,
+				A1000000000000000000D001 /* Localizable.strings in Resources */,
+				A1000000000000000000D002 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +446,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A1000000000000000000D011 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1000000000000000000D021 /* en */,
+				A1000000000000000000D022 /* da */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		A1000000000000000000D012 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1000000000000000000D023 /* en */,
+				A1000000000000000000D024 /* da */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		A10000000000000000000061 /* Debug */ = {

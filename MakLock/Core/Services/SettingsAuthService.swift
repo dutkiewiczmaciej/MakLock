@@ -54,7 +54,7 @@ final class SettingsAuthService {
         }
 
         AuthenticationService.shared.authenticateWithSystemFallback(
-            reason: "Access MakLock Settings"
+            reason: String(localized: "Access MakLock Settings")
         ) { result in
             switch result {
             case .success:

@@ -19,7 +19,7 @@ struct PrimaryButton: View {
                     Image(systemName: icon)
                         .font(.system(size: 14, weight: .semibold))
                 }
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(MakLockTypography.button)
             }
             .foregroundColor(MakLockColors.background)

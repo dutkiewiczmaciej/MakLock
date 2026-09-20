@@ -17,6 +17,9 @@ final class AppMonitorService: ObservableObject {
     /// Cleared when the app terminates, on idle timeout, sleep, or manual clear.
     private var authenticatedApps: Set<String> = []
 
+    /// When each app was last authenticated — used for the per-app "stay unlocked" period.
+    private var lastAuthenticated: [String: Date] = [:]
+
     /// Bundle IDs that have a pending overlay prompt (not yet authenticated or cancelled).
     /// Prevents checkRunningApps from triggering duplicate prompts.
     private var pendingLockBundleIDs: Set<String> = []
@@ -107,6 +110,10 @@ final class AppMonitorService: ObservableObject {
                 $0.bundleIdentifier == bundleID && $0.isEnabled
             }) {
                 guard !authenticatedApps.contains(bundleID) else { continue }
+                if isWithinStayUnlockedPeriod(protectedApp) {
+                    authenticatedApps.insert(bundleID)
+                    continue
+                }
                 guard !pendingLockBundleIDs.contains(bundleID) else { continue }
                 guard !OverlayWindowService.shared.isShowing else { continue }
 
@@ -127,13 +134,18 @@ final class AppMonitorService: ObservableObject {
     /// Mark an app as authenticated. It stays unlocked until the app quits, idle, or sleep.
     func markAuthenticated(_ bundleIdentifier: String) {
         authenticatedApps.insert(bundleIdentifier)
+        lastAuthenticated[bundleIdentifier] = Date()
         pendingLockBundleIDs.remove(bundleIdentifier)
         NSLog("[MakLock] App session authenticated: %@", bundleIdentifier)
     }
 
     /// Clear all authentication sessions (called on idle timeout, sleep, Watch out of range).
     func clearAllAuthentications() {
-        authenticatedApps.removeAll()
+        // Apps inside their "stay unlocked" period keep their session
+        let protectedApps = Defaults.shared.protectedApps
+        authenticatedApps = authenticatedApps.filter { bundleID in
+            protectedApps.contains { $0.bundleIdentifier == bundleID && isWithinStayUnlockedPeriod($0) }
+        }
         pendingLockBundleIDs.removeAll()
         NSLog("[MakLock] All app sessions cleared")
     }
@@ -141,6 +153,19 @@ final class AppMonitorService: ObservableObject {
     /// Clear authentication for a specific app.
     func clearAuthentication(for bundleIdentifier: String) {
         authenticatedApps.remove(bundleIdentifier)
+    }
+
+    /// Forget a pending lock prompt that was dismissed without authentication,
+    /// so the next launch or activation of the app shows the overlay again.
+    func clearPendingLock(for bundleIdentifier: String) {
+        pendingLockBundleIDs.remove(bundleIdentifier)
+    }
+
+    /// Whether the app was authenticated recently enough that it should not ask again yet.
+    func isWithinStayUnlockedPeriod(_ app: ProtectedApp) -> Bool {
+        guard let minutes = app.stayUnlockedMinutes, minutes > 0,
+              let last = lastAuthenticated[app.bundleIdentifier] else { return false }
+        return Date().timeIntervalSince(last) < TimeInterval(minutes) * 60
     }
 
     /// Check if an app is currently authenticated.
@@ -185,6 +210,13 @@ final class AppMonitorService: ObservableObject {
 
         // Skip if app is already authenticated in this session
         guard !authenticatedApps.contains(bundleID) else { return }
+
+        // Skip if the app is still inside its "stay unlocked" period
+        if isWithinStayUnlockedPeriod(protectedApp) {
+            authenticatedApps.insert(bundleID)
+            NSLog("[MakLock] Still within stay-unlocked period: %@", bundleID)
+            return
+        }
 
         // Don't show overlay if one is already showing
         guard !OverlayWindowService.shared.isShowing else { return }

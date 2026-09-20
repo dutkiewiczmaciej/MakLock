@@ -1,0 +1,170 @@
+/* MakLock — Danish (Dansk) */
+
+/* Menu bar */
+"Protection Active" = "Beskyttelse aktiv";
+"Protection Off" = "Beskyttelse slået fra";
+"1 protected app" = "1 beskyttet app";
+"%lld protected apps" = "%lld beskyttede apps";
+"Settings..." = "Indstillinger…";
+"About MakLock" = "Om MakLock";
+"Quit MakLock" = "Slut MakLock";
+
+/* Settings window */
+"MakLock Settings" = "MakLock-indstillinger";
+"General" = "Generelt";
+"Apps" = "Apps";
+"Security" = "Sikkerhed";
+"Watch" = "Watch";
+
+/* General settings */
+"Launch MakLock at login" = "Åbn MakLock ved log ind";
+"Lock apps when Mac sleeps" = "Lås apps, når Mac går på vågeblus";
+"Lock apps after idle timeout" = "Lås apps efter inaktivitet";
+"Timeout:" = "Tidsgrænse:";
+"%lld min" = "%lld min";
+"Auto-close timeout:" = "Luk automatisk efter:";
+"Apps with the timer icon enabled will quit after this period of inactivity." = "Apps med timer-symbolet slået til lukkes efter denne periode uden aktivitet.";
+"Check for Updates…" = "Søg efter opdateringer…";
+"MakLock %@ (%@)  ·  Made by MakMak" = "MakLock %@ (%@)  ·  Lavet af MakMak";
+
+/* Apps settings */
+"Protected Applications" = "Beskyttede apps";
+"Add App" = "Tilføj app";
+"No protected apps yet" = "Ingen beskyttede apps endnu";
+"Add apps to protect them with Touch ID or password." = "Tilføj apps for at beskytte dem med Touch ID eller adgangskode.";
+"Auto-close enabled" = "Automatisk lukning slået til";
+"Enable auto-close when inactive" = "Luk automatisk ved inaktivitet";
+"Stay unlocked: after unlocking, %@ won't ask for Touch ID again for %@, even after quitting, idle or sleep. Click to change." = "Forbliv låst op: Når %@ er låst op, spørger den ikke om Touch ID igen i %@ – heller ikke efter afslutning, inaktivitet eller vågeblus. Klik for at ændre.";
+"Stay unlocked: %@ asks for Touch ID every time it is opened. Click to let it stay unlocked for a while." = "Forbliv låst op: %@ beder om Touch ID, hver gang den åbnes. Klik for at lade den forblive låst op i et stykke tid.";
+"Auto-close is on: %@ quits after %lld min without use, so it can't show notifications while locked. Click to turn off." = "Automatisk lukning er slået til: %@ lukkes efter %lld min uden brug, så den ikke kan vise notifikationer, mens den er låst. Klik for at slå fra.";
+"Auto-close is off. Click to quit %@ automatically after %lld min without use (set in General)." = "Automatisk lukning er slået fra. Klik for at lukke %@ automatisk efter %lld min uden brug (indstilles under Generelt).";
+"Protection is on. Switch off to open this app without unlocking." = "Beskyttelse er slået til. Slå fra for at åbne appen uden at låse op.";
+"Protection is off. Switch on to require Touch ID for this app." = "Beskyttelse er slået fra. Slå til for at kræve Touch ID for denne app.";
+"Remove from the protected list" = "Fjern fra listen over beskyttede apps";
+"Ask every time" = "Spørg hver gang";
+"Stay unlocked for %lld minutes" = "Forbliv låst op i %lld minutter";
+"Stay unlocked for 1 hour" = "Forbliv låst op i 1 time";
+"Stay unlocked for %lld hours" = "Forbliv låst op i %lld timer";
+"%lld h" = "%lld t";
+
+/* App picker */
+"Add Applications" = "Tilføj apps";
+"Select Applications" = "Vælg apps";
+"Search apps..." = "Søg efter apps…";
+"%lld selected" = "%lld valgt";
+"Browse…" = "Gennemse…";
+"Choose an app that is not in the list" = "Vælg en app, der ikke står på listen";
+"Cancel" = "Annuller";
+"Add Selected" = "Tilføj valgte";
+"Choose Applications" = "Vælg apps";
+"Choose" = "Vælg";
+"%@ can't be protected because it has no bundle identifier." = "%@ kan ikke beskyttes, fordi den mangler et pakke-id.";
+"%@ can't be locked for safety reasons." = "%@ kan af sikkerhedsgrunde ikke låses.";
+"%@ is already protected." = "%@ er allerede beskyttet.";
+
+/* Security settings */
+"Require authentication on app launch" = "Kræv godkendelse, når en app åbnes";
+"Require authentication on app switch" = "Kræv godkendelse, når der skiftes til en app";
+"Touch ID Available" = "Touch ID er tilgængeligt";
+"Touch ID Not Available" = "Touch ID er ikke tilgængeligt";
+"Touch ID is not configured on this Mac. Use a backup password instead." = "Touch ID er ikke indstillet på denne Mac. Brug en reserveadgangskode i stedet.";
+"Backup Password" = "Reserveadgangskode";
+"Backup password is set" = "Reserveadgangskode er indstillet";
+"Change Password..." = "Skift adgangskode…";
+"No backup password set" = "Ingen reserveadgangskode indstillet";
+"A backup password lets you unlock apps when Touch ID is unavailable." = "Med en reserveadgangskode kan du låse apps op, når Touch ID ikke er tilgængeligt.";
+"Set Password..." = "Indstil adgangskode…";
+"Change Password" = "Skift adgangskode";
+"Set Backup Password" = "Indstil reserveadgangskode";
+"New Password" = "Ny adgangskode";
+"Confirm Password" = "Bekræft adgangskode";
+"Save" = "Gem";
+"Password cannot be empty." = "Adgangskoden må ikke være tom.";
+"Password must be at least 4 characters." = "Adgangskoden skal være på mindst 4 tegn.";
+"Passwords do not match." = "Adgangskoderne er ikke ens.";
+"Failed to save password. Please try again." = "Adgangskoden kunne ikke gemmes. Prøv igen.";
+
+/* Watch settings */
+"Use Apple Watch to unlock" = "Brug Apple Watch til at låse op";
+"Paired Watch" = "Parret Watch";
+"In range" = "Inden for rækkevidde";
+"Out of range" = "Uden for rækkevidde";
+"Unpair" = "Ophæv parring";
+"Copy" = "Kopier";
+"Searching for Apple Watch..." = "Søger efter Apple Watch…";
+"Make sure your Apple Watch is unlocked, on your wrist, and nearby." = "Sørg for, at dit Apple Watch er låst op, sidder på håndleddet og er i nærheden.";
+"Sensitivity" = "Følsomhed";
+"Range:" = "Rækkevidde:";
+"Far" = "Langt";
+"Medium" = "Mellem";
+"Close" = "Tæt på";
+"Lower sensitivity means the Watch can be farther away. Higher sensitivity requires the Watch to be closer." = "Lavere følsomhed betyder, at dit Watch kan være længere væk. Højere følsomhed kræver, at det er tættere på.";
+"How it works" = "Sådan virker det";
+"When your Apple Watch is nearby, MakLock can automatically unlock protected apps without requiring Touch ID or a password. If the Watch moves out of range, apps will be locked again." = "Når dit Apple Watch er i nærheden, kan MakLock automatisk låse beskyttede apps op uden Touch ID eller adgangskode. Hvis dit Watch kommer uden for rækkevidde, låses apps igen.";
+"Bluetooth is on" = "Bluetooth er slået til";
+"Bluetooth is off" = "Bluetooth er slået fra";
+"Turn on Bluetooth in System Settings to use Apple Watch unlock." = "Slå Bluetooth til i Systemindstillinger for at låse op med Apple Watch.";
+"Bluetooth Permission Required" = "Bluetooth-tilladelse påkrævet";
+"MakLock needs Bluetooth access to detect your Apple Watch. Grant permission in System Settings → Privacy & Security → Bluetooth." = "MakLock skal have adgang til Bluetooth for at finde dit Apple Watch. Giv tilladelse i Systemindstillinger → Anonymitet & sikkerhed → Bluetooth.";
+"Bluetooth is not supported on this Mac" = "Bluetooth understøttes ikke på denne Mac";
+"Checking Bluetooth status..." = "Kontrollerer Bluetooth-status…";
+
+/* About */
+"Version %@ (%@)" = "Version %@ (%@)";
+"Lock any macOS app with Touch ID or password." = "Lås enhver macOS-app med Touch ID eller adgangskode.";
+"Made by MakMak" = "Lavet af MakMak";
+"Free and open source under MIT License" = "Gratis og open source under MIT-licensen";
+
+/* Lock overlay */
+"%@ is Locked" = "%@ er låst";
+"Authenticating..." = "Godkender…";
+"Touch ID did not respond." = "Touch ID svarede ikke.";
+"Try Again" = "Prøv igen";
+"Use Password Instead" = "Brug adgangskode i stedet";
+"Enter Password" = "Skriv adgangskode";
+"Password" = "Adgangskode";
+"Unlock" = "Lås op";
+"Unlock %@" = "låse %@ op";
+"Unlock this app" = "låse denne app op";
+"Access MakLock Settings" = "åbne MakLock-indstillinger";
+"Unlocked" = "Låst op";
+"Apple Watch is nearby" = "Apple Watch er i nærheden";
+
+/* Notifications */
+"Access Denied" = "Adgang nægtet";
+"Someone tried to open %@ without unlocking it" = "Nogen forsøgte at åbne %@ uden at låse op";
+"Apple Watch unlocked %@" = "Apple Watch låste %@ op";
+"%@ unlocked with Touch ID" = "%@ låst op med Touch ID";
+
+/* Authentication errors */
+"Touch ID is not available on this Mac." = "Touch ID er ikke tilgængeligt på denne Mac.";
+"No fingerprints are enrolled in Touch ID." = "Der er ikke registreret nogen fingeraftryk i Touch ID.";
+"Touch ID is locked. Use your password instead." = "Touch ID er låst. Brug din adgangskode i stedet.";
+"Incorrect password. Please try again." = "Forkert adgangskode. Prøv igen.";
+"No backup password has been set. Go to Settings → Security." = "Der er ikke indstillet en reserveadgangskode. Gå til Indstillinger → Sikkerhed.";
+"Unknown error" = "Ukendt fejl";
+
+/* Onboarding */
+"Welcome to MakLock" = "Velkommen til MakLock";
+"Lock any macOS app with Touch ID or password.\nYour apps, your privacy." = "Lås enhver macOS-app med Touch ID eller adgangskode.\nDine apps, dit privatliv.";
+"Add Apps to Protect" = "Tilføj apps, der skal beskyttes";
+"Open Settings → Apps to choose which applications require authentication.\n\nStart with a test app like Chess." = "Åbn Indstillinger → Apps for at vælge, hvilke apps der kræver godkendelse.\n\nStart med en test-app som Skak.";
+"Continue" = "Fortsæt";
+"Get Started" = "Kom i gang";
+"Emergency Panic Key" = "Nødgenvej";
+"If you ever get locked out, this shortcut\ninstantly dismisses all overlays:" = "Hvis du bliver låst ude, fjerner denne genvej\nstraks alle låseskærme:";
+"Command" = "Kommando";
+"Option" = "Alternativ";
+"Shift" = "Skift";
+"Control" = "Kontrol";
+"Try it now — it always works, even in full screen." = "Prøv den nu — den virker altid, også i fuld skærm.";
+"Required as fallback when Touch ID is unavailable.\nYou can change it later in Settings." = "Bruges som reserve, når Touch ID ikke er tilgængeligt.\nDu kan ændre den senere i Indstillinger.";
+"Password saved!" = "Adgangskode gemt!";
+"Password (4+ characters)" = "Adgangskode (mindst 4 tegn)";
+"Hide password" = "Skjul adgangskode";
+"Show password" = "Vis adgangskode";
+"Save Password" = "Gem adgangskode";
+"Failed to save. Please try again." = "Kunne ikke gemme. Prøv igen.";
+"You're All Set" = "Så er du klar";
+"MakLock runs in your menu bar.\nProtected apps will require Touch ID — just put your finger on the sensor." = "MakLock kører i menulinjen.\nBeskyttede apps kræver Touch ID — læg blot fingeren på sensoren.";
+"You can also configure idle auto-lock\nand other options in Settings." = "Du kan også indstille automatisk lås ved inaktivitet\nog andre muligheder i Indstillinger.";

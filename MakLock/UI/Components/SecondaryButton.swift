@@ -12,7 +12,7 @@ struct SecondaryButton: View {
 
     var body: some View {
         Button(action: action) {
-            Text(title)
+            Text(LocalizedStringKey(title))
                 .font(MakLockTypography.caption)
                 .foregroundColor(MakLockColors.textSecondary)
                 .underline()

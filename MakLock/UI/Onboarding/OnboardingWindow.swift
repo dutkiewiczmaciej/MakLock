@@ -35,7 +35,7 @@ final class OnboardingWindowController {
             backing: .buffered,
             defer: false
         )
-        newWindow.title = "Welcome to MakLock"
+        newWindow.title = String(localized: "Welcome to MakLock")
         newWindow.contentView = hostingView
         newWindow.isReleasedWhenClosed = false
         newWindow.level = .floating

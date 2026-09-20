@@ -96,12 +96,12 @@ private struct InfoStepView: View {
                 .foregroundColor(MakLockColors.gold)
                 .frame(height: 60)
 
-            Text(step.title)
+            Text(LocalizedStringKey(step.title))
                 .font(MakLockTypography.largeTitle)
                 .foregroundColor(MakLockColors.textPrimary)
                 .multilineTextAlignment(.center)
 
-            Text(step.description)
+            Text(LocalizedStringKey(step.description))
                 .font(MakLockTypography.body)
                 .foregroundColor(MakLockColors.textSecondary)
                 .multilineTextAlignment(.center)
@@ -180,7 +180,7 @@ private struct KeyCap: View {
                         .shadow(color: .black.opacity(0.4), radius: 1, y: 2)
                 )
 
-            Text(label ?? " ")
+            Text(LocalizedStringKey(label ?? " "))
                 .font(.system(size: 8))
                 .foregroundColor(label != nil ? MakLockColors.textSecondary : .clear)
         }
@@ -242,7 +242,7 @@ private struct PasswordSetupStep: View {
                     HStack(spacing: 4) {
                         Image(systemName: showPassword ? "eye.slash" : "eye")
                             .font(.system(size: 11))
-                        Text(showPassword ? "Hide password" : "Show password")
+                        Text(LocalizedStringKey(showPassword ? "Hide password" : "Show password"))
                             .font(MakLockTypography.caption)
                     }
                     .foregroundColor(MakLockColors.textSecondary)
@@ -268,9 +268,9 @@ private struct PasswordSetupStep: View {
     private func passwordField(_ placeholder: String, text: Binding<String>) -> some View {
         Group {
             if showPassword {
-                TextField(placeholder, text: text)
+                TextField(LocalizedStringKey(placeholder), text: text)
             } else {
-                SecureField(placeholder, text: text)
+                SecureField(LocalizedStringKey(placeholder), text: text)
             }
         }
         .textFieldStyle(.roundedBorder)
@@ -279,15 +279,15 @@ private struct PasswordSetupStep: View {
 
     private func savePassword() {
         guard !password.isEmpty else {
-            errorMessage = "Password cannot be empty."
+            errorMessage = String(localized: "Password cannot be empty.")
             return
         }
         guard password.count >= 4 else {
-            errorMessage = "Password must be at least 4 characters."
+            errorMessage = String(localized: "Password must be at least 4 characters.")
             return
         }
         guard password == confirmPassword else {
-            errorMessage = "Passwords do not match."
+            errorMessage = String(localized: "Passwords do not match.")
             return
         }
 
@@ -298,7 +298,7 @@ private struct PasswordSetupStep: View {
                 isSaved = true
             }
         } else {
-            errorMessage = "Failed to save. Please try again."
+            errorMessage = String(localized: "Failed to save. Please try again.")
         }
     }
 }

@@ -1,0 +1,2 @@
+/* English is the development language: keys are the English strings, so no entries are needed here.
+   This file exists so the bundle declares English and other languages don't replace it. */

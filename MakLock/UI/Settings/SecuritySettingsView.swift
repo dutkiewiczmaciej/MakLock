@@ -31,7 +31,7 @@ struct SecuritySettingsView: View {
                         .font(.system(size: 20))
                         .foregroundColor(AuthenticationService.shared.isTouchIDAvailable ? MakLockColors.success : MakLockColors.textSecondary)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(AuthenticationService.shared.isTouchIDAvailable ? "Touch ID Available" : "Touch ID Not Available")
+                        Text(LocalizedStringKey(AuthenticationService.shared.isTouchIDAvailable ? "Touch ID Available" : "Touch ID Not Available"))
                             .font(MakLockTypography.body)
                         if !AuthenticationService.shared.isTouchIDAvailable {
                             Text("Touch ID is not configured on this Mac. Use a backup password instead.")
@@ -88,7 +88,7 @@ struct SecuritySettingsView: View {
 
     private var passwordSheet: some View {
         VStack(spacing: 16) {
-            Text(hasBackupPassword ? "Change Password" : "Set Backup Password")
+            Text(LocalizedStringKey(hasBackupPassword ? "Change Password" : "Set Backup Password"))
                 .font(MakLockTypography.title)
 
             SecureField("New Password", text: $newPassword)
@@ -121,17 +121,17 @@ struct SecuritySettingsView: View {
 
     private func savePassword() {
         guard !newPassword.isEmpty else {
-            passwordError = "Password cannot be empty."
+            passwordError = String(localized: "Password cannot be empty.")
             return
         }
 
         guard newPassword.count >= 4 else {
-            passwordError = "Password must be at least 4 characters."
+            passwordError = String(localized: "Password must be at least 4 characters.")
             return
         }
 
         guard newPassword == confirmPassword else {
-            passwordError = "Passwords do not match."
+            passwordError = String(localized: "Passwords do not match.")
             return
         }
 
@@ -141,7 +141,7 @@ struct SecuritySettingsView: View {
             hasBackupPassword = true
             showPasswordSheet = false
         } else {
-            passwordError = "Failed to save password. Please try again."
+            passwordError = String(localized: "Failed to save password. Please try again.")
         }
     }
 

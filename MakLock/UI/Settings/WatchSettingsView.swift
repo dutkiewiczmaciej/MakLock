@@ -39,7 +39,7 @@ struct WatchSettingsView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text("Apple Watch")
                                     .font(MakLockTypography.body)
-                                Text(watchService.isWatchInRange ? "In range" : "Out of range")
+                                Text(LocalizedStringKey(watchService.isWatchInRange ? "In range" : "Out of range"))
                                     .font(MakLockTypography.caption)
                                     .foregroundColor(watchService.isWatchInRange ? MakLockColors.success : .secondary)
                             }
@@ -175,9 +175,9 @@ struct WatchSettingsView: View {
 
     private var sensitivityLabel: String {
         switch sensitivity {
-        case 0..<30: return "Far"
-        case 30..<70: return "Medium"
-        default: return "Close"
+        case 0..<30: return String(localized: "Far")
+        case 30..<70: return String(localized: "Medium")
+        default: return String(localized: "Close")
         }
     }
 }

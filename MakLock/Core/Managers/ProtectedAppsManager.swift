@@ -60,6 +60,13 @@ final class ProtectedAppsManager: ObservableObject {
         }
     }
 
+    /// Set how long an app stays unlocked after authentication (`nil` = ask every time).
+    func setStayUnlockedMinutes(_ minutes: Int?, for app: ProtectedApp) {
+        guard let index = apps.firstIndex(where: { $0.id == app.id }) else { return }
+        apps[index].stayUnlockedMinutes = minutes
+        save()
+    }
+
     /// Check whether an app with the given bundle identifier is protected and enabled.
     func isProtected(_ bundleIdentifier: String) -> Bool {
         return apps.contains { $0.bundleIdentifier == bundleIdentifier && $0.isEnabled }

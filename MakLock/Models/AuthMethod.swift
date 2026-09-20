@@ -28,15 +28,15 @@ enum AuthError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .biometryNotAvailable:
-            return "Touch ID is not available on this Mac."
+            return String(localized: "Touch ID is not available on this Mac.")
         case .biometryNotEnrolled:
-            return "No fingerprints are enrolled in Touch ID."
+            return String(localized: "No fingerprints are enrolled in Touch ID.")
         case .biometryLockout:
-            return "Touch ID is locked. Use your password instead."
+            return String(localized: "Touch ID is locked. Use your password instead.")
         case .wrongPassword:
-            return "Incorrect password. Please try again."
+            return String(localized: "Incorrect password. Please try again.")
         case .noPasswordSet:
-            return "No backup password has been set. Go to Settings → Security."
+            return String(localized: "No backup password has been set. Go to Settings → Security.")
         case .systemError(let message):
             return message
         }

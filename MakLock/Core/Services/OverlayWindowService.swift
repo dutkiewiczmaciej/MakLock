@@ -8,10 +8,15 @@ final class OverlayWindowService {
     private var overlayWindows: [LockOverlayWindow] = []
     private var timeoutTimer: Timer?
     private var currentApp: ProtectedApp?
+    private var isDenying = false
 
     /// Callback when overlay is dismissed after successful authentication.
     /// Passes the name of the unlocked app.
     var onUnlocked: ((String) -> Void)?
+
+    /// Callback when the overlay is dismissed without authentication (cancelled or timed out).
+    /// Passes the name of the app that stayed locked.
+    var onAccessDenied: ((String) -> Void)?
 
     private init() {
         // Observe screen configuration changes (connect/disconnect monitors)
@@ -68,6 +73,43 @@ final class OverlayWindowService {
         NSLog("[MakLock] Overlay dismissed")
     }
 
+    /// Dismiss the overlay WITHOUT granting access: the protected app is hidden,
+    /// stays locked, and the attempt is recorded in the access log.
+    func deny(reason: String) {
+        guard let app = currentApp, !isDenying else { return }
+        isDenying = true
+
+        stopTimeoutTimer()
+        AuthenticationService.shared.cancelAuthentication()
+        AccessLog.record("Access denied to \(app.name) (\(app.bundleIdentifier)): \(reason)")
+
+        // Hide the app before removing the blur so its content is never revealed
+        NSWorkspace.shared.runningApplications
+            .first { $0.bundleIdentifier == app.bundleIdentifier }?
+            .hide()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self else { return }
+            self.isDenying = false
+            // Authenticated (e.g. by Watch) or dismissed in the meantime
+            guard self.currentApp?.bundleIdentifier == app.bundleIdentifier else { return }
+
+            self.overlayWindows.forEach { $0.close() }
+            self.overlayWindows.removeAll()
+            self.currentApp = nil
+
+            // Let the next activation of the app trigger the lock again
+            AppMonitorService.shared.clearPendingLock(for: app.bundleIdentifier)
+            self.onAccessDenied?(app.name)
+            NSLog("[MakLock] Overlay dismissed without authentication")
+
+            // The app could not be hidden and is still in front — keep it locked
+            if NSWorkspace.shared.frontmostApplication?.bundleIdentifier == app.bundleIdentifier {
+                self.show(for: app)
+            }
+        }
+    }
+
     /// Dismiss all overlays (used by panic key).
     func dismissAll() {
         hide()
@@ -88,11 +130,17 @@ final class OverlayWindowService {
         currentApp?.name
     }
 
-    /// During Touch ID: pass through mouse events so system dialog gets interaction.
-    /// After auth: restore mouse capture for overlay blocking.
+    /// During Touch ID: drop the overlay just below the system Touch ID dialog
+    /// (which is shown at the screen-saver level) so the dialog is always visible
+    /// and clickable. The overlay keeps receiving clicks, so its Cancel button works.
+    /// After auth: restore the normal overlay level.
     func setTouchIDMode(_ active: Bool) {
+        let level: NSWindow.Level = active
+            ? NSWindow.Level(rawValue: NSWindow.Level.screenSaver.rawValue - 1)
+            : .screenSaver
         for window in overlayWindows {
-            window.ignoresMouseEvents = active
+            window.level = level
+            window.ignoresMouseEvents = false
         }
     }
 
@@ -137,6 +185,9 @@ final class OverlayWindowService {
                         let name = self?.currentApp?.name ?? "app"
                         self?.hide()
                         self?.onUnlocked?(name)
+                    },
+                    onCancel: { [weak self] in
+                        self?.deny(reason: "cancelled at the lock screen")
                     }
                 )
                 window.contentView = NSHostingView(rootView: overlayView)
@@ -163,6 +214,9 @@ final class OverlayWindowService {
                     let name = self?.currentApp?.name ?? "app"
                     self?.hide()
                     self?.onUnlocked?(name)
+                },
+                onCancel: { [weak self] in
+                    self?.deny(reason: "cancelled at the lock screen")
                 }
             )
 
@@ -195,7 +249,8 @@ final class OverlayWindowService {
 
         timeoutTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
             NSLog("[MakLock Safety] Overlay timeout reached (%.0fs) — auto-dismissing", timeout)
-            self?.hide()
+            // Never grant access on timeout — dismiss and keep the app locked
+            self?.deny(reason: "lock screen timed out without authentication")
         }
     }
 
@@ -204,4 +259,31 @@ final class OverlayWindowService {
         timeoutTimer = nil
     }
 
+}
+
+// MARK: - Access Log
+
+/// Records failed access attempts to `~/Library/Logs/MakLock/access.log` (viewable in Console).
+enum AccessLog {
+    static let fileURL = FileManager.default.homeDirectoryForCurrentUser
+        .appendingPathComponent("Library/Logs/MakLock/access.log")
+
+    static func record(_ message: String) {
+        NSLog("[MakLock Access] %@", message)
+
+        let line = "\(ISO8601DateFormatter().string(from: Date())) \(message)\n"
+        guard let data = line.data(using: .utf8) else { return }
+
+        try? FileManager.default.createDirectory(
+            at: fileURL.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        if let handle = try? FileHandle(forWritingTo: fileURL) {
+            handle.seekToEndOfFile()
+            handle.write(data)
+            try? handle.close()
+        } else {
+            try? data.write(to: fileURL)
+        }
+    }
 }

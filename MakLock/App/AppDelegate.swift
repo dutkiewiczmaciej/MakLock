@@ -50,6 +50,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Self.sendUnlockNotification(appName: appName)
         }
 
+        // Overlay dismissed without authentication — app stays locked
+        OverlayWindowService.shared.onAccessDenied = { [weak self] appName in
+            self?.menuBarController.iconState = .active
+            Self.sendNotification(
+                title: String(localized: "Access Denied"),
+                body: String(localized: "Someone tried to open \(appName) without unlocking it")
+            )
+        }
+
         // Start Watch proximity BEFORE app monitoring so Watch has time to connect.
         // This prevents false overlay triggers on app restart.
         if Defaults.shared.appSettings.useWatchUnlock {
@@ -122,6 +131,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let runningBundleIDs = Set(NSWorkspace.shared.runningApplications.map(\.bundleIdentifier))
         let apps = ProtectedAppsManager.shared.apps.filter {
             $0.isEnabled && runningBundleIDs.contains($0.bundleIdentifier)
+                && !AppMonitorService.shared.isWithinStayUnlockedPeriod($0)
         }
 
         var showedOverlay = false
@@ -174,12 +184,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Post a local notification when Watch auto-unlocks an app.
     static func sendWatchUnlockNotification(appName: String) {
-        sendNotification(title: "Unlocked", body: "Apple Watch unlocked \(appName)")
+        sendNotification(title: String(localized: "Unlocked"), body: String(localized: "Apple Watch unlocked \(appName)"))
     }
 
     /// Post a local notification when Touch ID or password unlocks an app.
     static func sendUnlockNotification(appName: String) {
-        sendNotification(title: "Unlocked", body: "\(appName) unlocked with Touch ID")
+        sendNotification(title: String(localized: "Unlocked"), body: String(localized: "\(appName) unlocked with Touch ID"))
     }
 
     private static func sendNotification(title: String, body: String) {
