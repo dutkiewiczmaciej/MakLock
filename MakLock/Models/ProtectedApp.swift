@@ -22,6 +22,11 @@ struct ProtectedApp: Codable, Identifiable, Hashable {
     /// to prevent notifications from appearing while the app is locked.
     var autoClose: Bool
 
+    /// Minutes the app stays unlocked after a successful authentication, even across
+    /// relaunch, idle lock and sleep. `nil` means ask every time (default behaviour).
+    /// Optional so lists saved by older versions still decode.
+    var stayUnlockedMinutes: Int?
+
     /// Date the app was added to the protected list.
     let dateAdded: Date
 
@@ -32,6 +37,7 @@ struct ProtectedApp: Codable, Identifiable, Hashable {
         path: String,
         isEnabled: Bool = true,
         autoClose: Bool = false,
+        stayUnlockedMinutes: Int? = nil,
         dateAdded: Date = Date()
     ) {
         self.id = id
@@ -40,6 +46,7 @@ struct ProtectedApp: Codable, Identifiable, Hashable {
         self.path = path
         self.isEnabled = isEnabled
         self.autoClose = autoClose
+        self.stayUnlockedMinutes = stayUnlockedMinutes
         self.dateAdded = dateAdded
     }
 }

@@ -122,6 +122,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let runningBundleIDs = Set(NSWorkspace.shared.runningApplications.map(\.bundleIdentifier))
         let apps = ProtectedAppsManager.shared.apps.filter {
             $0.isEnabled && runningBundleIDs.contains($0.bundleIdentifier)
+                && !AppMonitorService.shared.isWithinStayUnlockedPeriod($0)
         }
 
         var showedOverlay = false
