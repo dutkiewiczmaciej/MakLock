@@ -158,4 +158,4 @@ If you find MakLock useful, consider giving it a [star on GitHub](https://github
 
 ## License
 
-[MIT](LICENSE) — Made by [MakMak](https://github.com/dutkiewiczmaciej)
+[MIT](LICENSE) — Made by [Maciej Dutkiewicz](https://github.com/dutkiewiczmaciej)

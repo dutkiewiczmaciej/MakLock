@@ -32,7 +32,7 @@ struct AboutView: View {
 
             // Credits
             VStack(spacing: 4) {
-                Text("Made by MakMak")
+                Text("Made by Maciej Dutkiewicz")
                     .font(MakLockTypography.body)
                 Text("Free and open source under MIT License")
                     .font(MakLockTypography.caption)

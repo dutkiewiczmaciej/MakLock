@@ -81,7 +81,7 @@ struct GeneralSettingsView: View {
                 }
 
                 HStack(spacing: 8) {
-                    Text("MakLock \(version) (\(build))  ·  Made by MakMak")
+                    Text("MakLock \(version) (\(build))  ·  Made by Maciej Dutkiewicz")
                         .foregroundColor(MakLockColors.textSecondary)
                     Link(destination: URL(string: "https://github.com/dutkiewiczmaciej/MakLock")!) {
                         HStack(spacing: 3) {

@@ -8,7 +8,7 @@ MakLock is a lightweight menu bar application for macOS that protects your apps 
 
 - **Price**: Free forever, open source (MIT license)
 - **Platform**: macOS 13 (Ventura) or later, Apple Silicon + Intel
-- **Author**: MakMak (Maciej Dutkiewicz)
+- **Author**: Maciej Dutkiewicz
 - **Website**: https://dutkiewiczmaciej.github.io/MakLock/
 - **Source code**: https://github.com/dutkiewiczmaciej/MakLock
 - **Download**: https://github.com/dutkiewiczmaciej/MakLock/releases/latest
